@@ -8,8 +8,9 @@ Created on Thu May  7 17:58:52 2026
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
+from datetime import datetime
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from classes.corporation import Corporation
 from classes.client import Client
 from classes.broker import Broker
@@ -171,6 +172,7 @@ def cliente_dashboard(id):
         return "Erro: Cliente não encontrado!", 404
 
     cliente = Client.obj[id]
+    todos_brokers = [Broker.obj[bid] for bid in Broker.lst]
     
     trades_data = []
     for t in Trade.obj.values():
@@ -187,6 +189,9 @@ def cliente_dashboard(id):
             })
     
     df_all = pd.DataFrame(trades_data)
+    if df_all.empty:
+        return render_template('cliente_dashboard.html', cliente=cliente, brokers=todos_brokers, negocios=[], total_investido=0, total_negocios=0, graph_html=None)
+    
     df_cliente = df_all[df_all['client_id']==id]
     
     if df_cliente.empty:
@@ -196,22 +201,64 @@ def cliente_dashboard(id):
     total_negocios = len(df_cliente)
     
     df_grouped = df_cliente.groupby('broker_name')['amount'].sum().reset_index()
+    df_grouped = df_grouped[df_grouped['amount'] > 0]
     
-    fig = px.pie(df_grouped, values='amount', names='broker_name',
-                 title='Distribuição de Investimento por Corretor',
-                 hole=0.4,
-                 color_discrete_sequence=px.colors.sequential.RdBu)
-    
-    graph_html = pio.to_html(fig, full_html=False)
+    if not df_grouped.empty:
+        fig = px.pie(df_grouped, values='amount', names='broker_name',
+                     title='Distribuição de Investimento por Corretor',
+                     hole=0.4,
+                     color_discrete_sequence=px.colors.sequential.RdBu)
+        
+        graph_html = pio.to_html(fig, full_html=False)
+    else:
+        graph_html = "<p style='text-align:center; color:#7f8c8d;'>Sem investimentos ativos no momento.</p>"
     
     return render_template('cliente_dashboard.html', 
                            cliente=cliente, 
+                           brokers=todos_brokers,
                            negocios=df_cliente.to_dict('records'),
                            total_investido=total_investido,
                            total_negocios=total_negocios,
                            graph_html=graph_html)
     
+@app.route('/trade/new', methods=['POST'])
+def new_trade():
+    client_id = int(request.form.get('client_id'))
+    broker_id = int(request.form.get('broker_id'))
+    amount = float(request.form.get('amount'))
+    tipo = request.form.get('tipo')
+        
+        # 1. Gerar a data atual no momento do clique
+    data_atual = datetime.now().strftime("%Y-%m-%d") # Podes ajustar o formato (ex: "%d/%m/%Y")
+        
+        # 2. Definir o t.name e ajustar o sinal do amount
+    if tipo == 'investir':
+        trade_name = "Novo Investimento"
+        amount = abs(amount)
+    else:
+        saldo_neste_broker = sum(t.amount for t in Trade.obj.values() if t.client_id == client_id and t.broker_id == broker_id)
+        
+        # 2. A "Parede de Segurança": Se tentar levantar mais do que tem...
+        if amount > saldo_neste_broker:
+            # Retorna uma mensagem de erro simples (no futuro podes fazer isto aparecer num Pop-up bonito)
+            return f"<h1>Operação Recusada!</h1><p>Tentou levantar {amount}€, mas o seu saldo no Broker selecionado é de apenas {saldo_neste_broker}€.</p><a href='/cliente/{client_id}/dashboard'>Voltar à Dashboard</a>", 400
+        trade_name = "Levantamento"
+        amount = -abs(amount)
+        
+        # 3. Gerar ID e criar o objeto
+    new_id = max(Trade.lst) + 1 if Trade.lst else 1
+        
+        # Substitui pela ordem EXATA dos argumentos do teu __init__ da classe Trade
+        # Assumi que a tua ordem é (id, client_id, broker_id, amount, date, name)
+    Trade(new_id, broker_id, client_id, trade_name, data_atual, amount)
+    
+    query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, '{trade_name}', '{data_atual}', {amount})"
+    
+    # Executamos o comando através da classe Trade (que herdou sqlexe do Gclass)
+    Trade.sqlexe(query)
+        
+    return redirect(url_for('cliente_dashboard', id=client_id))
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True, port=5001)
     
