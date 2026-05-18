@@ -1,32 +1,32 @@
-db = 'business.db'
+# Escolhe apenas UM destes blocos para descomentar de cada vez:
 
-# Uncomment to test class Corporation (select next 4 lines and press ctrl-1)
+# --- TESTE CORPORATION ---
 from classes.corporation import Corporation
 test_class = Corporation
-ob = '1;Empresa XPTO;500123456'
-db = 'corporation.db'
+ob = '1;Empresa XPTO;Sem comentarios' # Dados exemplo para o "Insert" inicial
 
-# Uncomment to test class Broker (select next 4 lines and press ctrl-1)
-# from classes.broker import Broker
-# test_class = Broker
-# ob = '1;João Corretor;123456;1'
-# db = 'broker.db'
+# --- TESTE BROKER ---
+#from classes.broker import Broker
+#test_class = Broker
+#ob = '1;Nome do Corretor;12345;1'
 
-# Uncomment to test class Client (select next 4 lines and press ctrl-1)
-# from classes.client import Client
-# test_class = Client
-# ob = '1;Maria Silva;maria@email.com'
-# db = 'client.db'
+# --- TESTE CLIENT ---
+#from classes.client import Client
+#test_class = Client
+#ob = '1;Nome do Cliente;Rua ABC'
 
-# Uncomment to test class Transaction (select next 4 lines and press ctrl-1)
-# from classes.transaction import Transaction
-# test_class = Transaction
-# ob = '1;1;1;Acoes Apple;2026-04-02;1500.50'
-# db = 'transaction.db'
+# --- TESTE TRADE ---
+#from classes.trade import Trade
+#test_class = Trade
+#ob = '10000;2;806;Investimento;2025-06-16;21290.4'
+
+
+# A VARIAVEL DB DEVE SER SEMPRE ESTA:
+db = 'business.db' 
 
 import datetime
 
-# Reads the test_class db/csv file
+# Certifica-te que o caminho inclui a pasta 'data/'
 test_class.read('data/' + db)
 
 op = ''

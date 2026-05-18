@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Broker Dashboard - {{ broker.name }}</title>
+    <style>
+      .btn-voltar {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #34495e; /* Um tom escuro para contrastar */
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 0.9em;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+      }
+
+      .btn-voltar:hover {
+        background-color: #1a252f;
+      }
+
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1200px;
+        margin: auto;
+      }
+      .header {
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .grid-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .card h4 {
+        margin: 0;
+        color: #95a5a6;
+        font-size: 0.85em;
+        text-transform: uppercase;
+      }
+      .card p {
+        margin: 10px 0 0;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+
+      /* Estilo do Badge de Risco */
+      .risk-badge {
+        padding: 5px 15px;
+        border-radius: 20px;
+        color: white;
+        font-size: 0.7em;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+      }
+
+      .main-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+      }
+      .chart-container,
+      .table-container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th {
+        text-align: left;
+        border-bottom: 2px solid #eee;
+        padding: 10px;
+        color: #7f8c8d;
+      }
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="/login" class="btn-voltar">← Sair/Trocar Perfil</a>
+
+      <div class="header">
+        <h1>
+          Broker: {{ broker.name }}
+          <span class="risk-badge" style="background-color: {{ risco.cor }}"
+            >RISCO {{ risco.nivel }}</span
+          >
+        </h1>
+        <p>Empresa: {{ empresa }} | Licença: #{{ broker.license_number }}</p>
+        <small style="color: #bdc3c7">⚠️ {{ risco.msg }}</small>
+      </div>
+
+      <div class="grid-kpis">
+        <div class="card">
+          <h4>AUM Total</h4>
+          <p>{{ "%.2f"|format(total_investido) }} €</p>
+        </div>
+        <div class="card">
+          <h4>Ticket Médio</h4>
+          <p>{{ "%.2f"|format(ticket_medio) }} €</p>
+        </div>
+        <div class="card">
+          <h4>Clientes Ativos</h4>
+          <p>{{ num_clientes }}</p>
+        </div>
+        <div class="card">
+          <h4></h4>
+          <p></p>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="chart-container">{{ graph_html|safe }}</div>
+
+        <div class="table-container">
+          <h3>Últimos Negócios</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in negocios[:8] %}
+              <tr>
+                <td>{{ t.client_name }}</td>
+                <td><strong>{{ "%.2f"|format(t.amount) }} €</strong></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
