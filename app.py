@@ -27,6 +27,9 @@ Broker.read(db_path)
 Client.read(db_path)  
 Trade.read(db_path)
 
+@app.route('/')
+def index():
+    return redirect(url_for('login_simulado'))
 
 @app.route('/login')
 def login_simulado():
