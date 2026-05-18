@@ -31,8 +31,12 @@ Client.read(db_path)
 Trade.read(db_path)
 
 @app.route('/')
+def home():
+    return redirect(url_for('index'))
+
+@app.route('/index')
 def index():
-    return redirect(url_for('login_simulado'))
+    return render_template('index.html')
 
 @app.route('/login')
 def login_simulado():
