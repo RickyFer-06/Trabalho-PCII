@@ -5,6 +5,7 @@ Created on Thu May  7 17:58:52 2026
 
 @author: goncalotavares
 """
+import os
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
@@ -20,7 +21,7 @@ from classes.trade import Trade
 app = Flask(__name__)
 
 
-db_path = 'data/business.db'
+db_path = os.path.join(os.path.dirname(__file__), 'data/business.db')
 Corporation.read(db_path)
 Broker.read(db_path)
 Client.read(db_path)  
