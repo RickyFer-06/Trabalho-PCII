@@ -38,6 +38,20 @@ def home():
 def index():
     return render_template('index.html')
 
+@app.route('/user_login')
+def user_login():
+    return render_template('login.html', user='', password='', resul='')
+
+@app.route('/chklogin', methods=['POST'])
+def chklogin():
+    user = request.form.get('user')
+    password = request.form.get('password')
+    
+    if user == 'admin' and password == 'admin':
+        return redirect(url_for('login_simulado'))
+    else:
+        return render_template('login.html', user=user, password=password, resul='Credenciais inválidas. Tente novamente!')
+
 @app.route('/login')
 def login_simulado():
     
