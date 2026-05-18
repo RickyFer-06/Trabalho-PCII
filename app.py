@@ -20,6 +20,9 @@ from classes.trade import Trade
 
 app = Flask(__name__)
 
+@app.template_filter('moeda')
+def moeda_filter(value):
+    return f"{value:,.2f} €".replace(',', 'X').replace('.', ',').replace('X', '.')
 
 db_path = os.path.join(os.path.dirname(__file__), 'data/business.db')
 Corporation.read(db_path)
