@@ -314,6 +314,49 @@ def new_trade():
         
     return redirect(url_for('cliente_dashboard', id=client_id))
 
+@app.route('/stats')
+def stats():
+    all_trades = list(Trade.obj.values())
+    total_trades = len(all_trades)
+    total_aum = sum(t.amount for t in all_trades)
+
+    corp_volumes = {}
+    for t in all_trades:
+        broker = Broker.obj.get(t.broker_id)
+        if broker:
+            corp = Corporation.obj.get(broker.corporation_id)
+            if corp:
+                corp_volumes[corp.name] = corp_volumes.get(corp.name, 0) + t.amount
+
+    df_corp = pd.DataFrame(list(corp_volumes.items()), columns=['Corporação', 'Volume'])
+    df_corp = df_corp.sort_values('Volume', ascending=True).tail(10)
+    fig_corp = px.bar(df_corp, x='Volume', y='Corporação', orientation='h',
+        title='Top 10 Corporações por Volume',
+        color='Volume', color_continuous_scale='Blues')
+    graph_corp = pio.to_html(fig_corp, full_html=False)
+
+    broker_volumes = {}
+    for t in all_trades:
+        broker = Broker.obj.get(t.broker_id)
+        if broker:
+            broker_volumes[broker.name] = broker_volumes.get(broker.name, 0) + t.amount
+
+    df_broker = pd.DataFrame(list(broker_volumes.items()), columns=['Broker', 'Volume'])
+    df_broker = df_broker.sort_values('Volume', ascending=True).tail(5)
+    fig_broker = px.bar(df_broker, x='Volume', y='Broker', orientation='h',
+                        title='Top 5 Brokers por Volume',
+                        color='Volume', color_continuous_scale='Blues')
+    graph_broker = pio.to_html(fig_broker, full_html=False)
+
+    return render_template('stats.html',
+                           total_trades=total_trades,
+                           total_aum=total_aum,
+                           num_clients=len(Client.lst),
+                           num_brokers=len(Broker.lst),
+                           num_corps=len(Corporation.lst),
+                           graph_corp=graph_corp,
+                           graph_broker=graph_broker)
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
     
