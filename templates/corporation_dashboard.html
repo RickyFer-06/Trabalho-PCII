@@ -120,7 +120,7 @@
 
 <body>
   <div class="container">
-    <a href="/login" class="btn-voltar">← Sair para Menu Principal</a>
+    <a href="/index" class="btn-voltar">← Sair para Menu Principal</a>
 
     <div class="header">
       <span class="risk-badge" style="background: {{ risk.cor }}">RISCO CORPORATIVO: {{ risk.nivel }}</span>
@@ -168,13 +168,36 @@
           </thead>
           <tbody>
             {% for b in brokers %}
-            <tr>
-              <td><strong>{{ b.obj.name }}</strong></td>
-              <td>{{ b.aum | moeda }} €</td>
+            <tr style="background-color: #fafafa;">
+              <td>
+                <a href="/broker/{{ b.obj.id }}/dashboard" style="color: #2980b9; text-decoration: none; font-weight: bold;" title="Ir para dashboard do broker">
+                  {{ b.obj.name }} 🔗
+                </a>
+                <span style="cursor: pointer; margin-left: 10px; color: #7f8c8d; font-size: 0.85em;" onclick="document.getElementById('clients-{{ b.obj.id }}').style.display = document.getElementById('clients-{{ b.obj.id }}').style.display === 'none' ? 'table-row' : 'none';">
+                  Ver Clientes ▾
+                </span>
+              </td>
+              <td>{{ b.aum | moeda }}</td>
               <td>{{ b.num_clients }}</td>
               <td>
                 <span class="status-dot" style="background: {{ b.risk_color }}"></span>
                 {{ b.risk_status }}
+              </td>
+            </tr>
+            <tr id="clients-{{ b.obj.id }}" style="display: none; background-color: #fff;">
+              <td colspan="4" style="padding: 0;">
+                <div style="padding: 15px; border-left: 3px solid #3498db; margin-left: 10px;">
+                  <h5 style="margin-top: 0; color: #34495e; font-size: 0.85em; text-transform: uppercase;">Clientes deste Broker:</h5>
+                  {% if b.clients %}
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9em; color: #555;">
+                      {% for cli in b.clients %}
+                        <li>{{ cli.name }}: <strong>{{ cli.amount | moeda }}</strong></li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p style="margin: 0; font-size: 0.9em; color: #999;">Sem clientes associados.</p>
+                  {% endif %}
+                </div>
               </td>
             </tr>
             {% endfor %}

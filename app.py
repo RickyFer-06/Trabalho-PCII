@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu May  7 17:58:52 2026
-
-@author: goncalotavares
-"""
 import os
 import pandas as pd
 import plotly.express as px
@@ -49,6 +42,18 @@ def chklogin():
     
     if user == 'admin' and password == 'admin':
         return redirect(url_for('login_simulado'))
+    elif user == 'corp' and password == 'corp':
+        # Assumiremos a primeira corporation da lista para efeitos de demonstração
+        primeira_corp = Corporation.lst[0] if Corporation.lst else 1
+        return redirect(url_for('corporation_dashboard', id=primeira_corp))
+    elif user == 'broker' and password == 'broker':
+        # Assumiremos o primeiro broker da lista
+        primeiro_broker = Broker.lst[0] if Broker.lst else 1
+        return redirect(url_for('broker_dashboard', id=primeiro_broker))
+    elif user == 'client' and password == 'client':
+        # Assumiremos o primeiro cliente da lista
+        primeiro_cliente = Client.lst[0] if Client.lst else 1
+        return redirect(url_for('cliente_dashboard', id=primeiro_cliente))
     else:
         return render_template('login.html', user=user, password=password, resul='Credenciais inválidas. Tente novamente!')
 
@@ -81,7 +86,7 @@ def corporation_dashboard(id):
         b_trades = [Trade.obj[t_id] for t_id in Trade.lst if Trade.obj[t_id].broker_id == b.id]
         
         if not b_trades:
-            broker_stats.append({'obj': b, 'aum': 0, 'risk_status': 'N/A', 'risk_color': '#95a5a6'})
+            broker_stats.append({'obj': b, 'aum': 0, 'num_clients': 0, 'clients': [], 'risk_status': 'N/A', 'risk_color': '#95a5a6'})
             continue
 
         df_b = pd.DataFrame([{'client_id': t.client_id, 'amount': t.amount} for t in b_trades])
@@ -96,10 +101,19 @@ def corporation_dashboard(id):
         else:
             status, color = 'BAIXO', '#27ae60'
             
+        clientes_info = []
+        for c_id, group in df_b.groupby('client_id'):
+            c_name = Client.obj[c_id].name if c_id in Client.obj else f"Cliente {c_id}"
+            clientes_info.append({'name': c_name, 'amount': group['amount'].sum()})
+            
+        # Ordenar os clientes por amount descrescente para melhor visualização
+        clientes_info = sorted(clientes_info, key=lambda x: x['amount'], reverse=True)
+            
         broker_stats.append({
             'obj': b,
             'aum': b_aum,
             'num_clients': df_b['client_id'].nunique(),
+            'clients': clientes_info,
             'risk_status': status,
             'risk_color': color
         })
@@ -143,18 +157,33 @@ def broker_dashboard(id):
     empresa = Corporation.obj[broker.corporation_id].name if broker.corporation_id in Corporation.obj else "Independente"
     
     trades_list = []
+    # Agrupar trades por cliente
+    clientes_dict = {}
+    
     for t in Trade.obj.values():
         if t.broker_id == id:
             c_name = Client.obj[t.client_id].name if t.client_id in Client.obj else f"Cliente {t.client_id}"
-            trades_list.append({
+            trade_info = {
+                'id': t.id,
                 'client_name': c_name,
                 'amount': t.amount,
                 'date': t.date,
-                'trade_name': t.name})
-    
+                'trade_name': t.name
+            }
+            trades_list.append(trade_info)
+            
+            if t.client_id not in clientes_dict:
+                clientes_dict[t.client_id] = {'name': c_name, 'total': 0, 'trades': []}
+            clientes_dict[t.client_id]['total'] += t.amount
+            clientes_dict[t.client_id]['trades'].append(trade_info)
+            
     df = pd.DataFrame(trades_list)
+    
+    # Passando a lista de clientes para a view
+    lista_clientes = sorted(clientes_dict.values(), key=lambda x: x['total'], reverse=True)
+    
     if df.empty:
-        return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, risco={'nivel': 'N/A'}, graph_html=None)
+        return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, ticket_medio=0, num_clientes=0, risco={'nivel': 'N/A'}, graph_html=None, negocios=[], lista_clientes=[])
     
     total_aum = df['amount'].sum()
     ticket_medio = df['amount'].mean()
@@ -189,7 +218,8 @@ def broker_dashboard(id):
                            num_clientes=num_clientes,
                            risco=risco,
                            graph_html=graph_html,
-                           negocios=df.to_dict('records'))
+                           negocios=trades_list,
+                           lista_clientes=lista_clientes)
 
 @app.route('/cliente/<int:id>/dashboard')
 def cliente_dashboard(id):

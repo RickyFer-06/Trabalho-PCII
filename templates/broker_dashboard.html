@@ -124,7 +124,7 @@
 
 <body>
   <div class="container">
-    <a href="/login" class="btn-voltar">← Sair/Trocar Perfil</a>
+    <a href="javascript:history.back()" class="btn-voltar">← Voltar</a>
 
     <div class="header">
       <h1>
@@ -157,21 +157,55 @@
     <div class="main-content">
       <div class="chart-container">{{ graph_html|safe }}</div>
 
-      <div class="table-container">
-        <h3>Últimos Negócios</h3>
+      <div class="table-container" style="max-height: 500px; overflow-y: auto;">
+        <h3>Lista de Clientes & Transações</h3>
         <table>
           <thead>
             <tr>
               <th>Cliente</th>
-              <th>Valor</th>
+              <th>Total Investido</th>
             </tr>
           </thead>
           <tbody>
-            {% for t in negocios[:8] %}
-            <tr>
-              <td>{{ t.client_name }}</td>
-              <td><strong>{{ t.amount | moeda }} €</strong></td>
+            {% for cli in lista_clientes %}
+            <tr style="background-color: #fafafa;">
+              <td>
+                <strong>{{ cli.name }}</strong>
+                <span style="cursor: pointer; margin-left: 10px; color: #2980b9; font-size: 0.85em;" onclick="document.getElementById('cli-trades-{{ loop.index }}').style.display = document.getElementById('cli-trades-{{ loop.index }}').style.display === 'none' ? 'table-row' : 'none';">
+                  Ver Transações ▾
+                </span>
+              </td>
+              <td><strong>{{ cli.total | moeda }}</strong></td>
             </tr>
+            <tr id="cli-trades-{{ loop.index }}" style="display: none; background-color: #fff;">
+              <td colspan="2" style="padding: 0;">
+                <div style="padding: 10px 15px; border-left: 3px solid #2ecc71; margin-left: 10px; background-color: #fcfcfc;">
+                  <h5 style="margin-top: 0; color: #7f8c8d; font-size: 0.8em; text-transform: uppercase;">Apenas operações com {{ broker.name }} ({{ empresa }}):</h5>
+                  <table style="margin-top: 5px; background: white; border: 1px solid #eee;">
+                    <thead>
+                      <tr>
+                        <th style="font-size: 0.8em; padding: 5px;">Data</th>
+                        <th style="font-size: 0.8em; padding: 5px;">Tipo</th>
+                        <th style="font-size: 0.8em; padding: 5px;">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for t in cli.trades %}
+                      <tr>
+                        <td style="font-size: 0.8em; padding: 5px; border-bottom: 1px solid #f9f9f9;">{{ t.date }}</td>
+                        <td style="font-size: 0.8em; padding: 5px; border-bottom: 1px solid #f9f9f9;">{{ t.trade_name }}</td>
+                        <td style="font-size: 0.8em; padding: 5px; border-bottom: 1px solid #f9f9f9; color: {% if t.amount < 0 %}red{% else %}green{% endif %};">
+                          {{ t.amount | moeda }}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">Nenhum cliente ativo.</td></tr>
             {% endfor %}
           </tbody>
         </table>
