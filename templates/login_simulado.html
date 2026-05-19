@@ -1,106 +1,141 @@
 <!doctype html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Portal de Acesso - Business Manager</title>
-    <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background-color: #f0f2f5;
-        margin: 0;
-        padding: 40px;
-      }
-      h1 {
-        text-align: center;
-        color: #1c1e21;
-      }
-      .container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-top: 30px;
-      }
 
-      .column {
-        background: white;
-        border-radius: 8px;
-        width: 300px;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>Portal de Acesso - Business Manager</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 40px;
+    }
 
-      .column h2 {
-        border-bottom: 2px solid;
-        padding-bottom: 10px;
-        margin-top: 0;
-      }
-      .corp-title {
-        color: #2c3e50;
-      }
-      .broker-title {
-        color: #3498db;
-      }
-      .client-title {
-        color: #27ae60;
-      }
+    h1 {
+      text-align: center;
+      color: #1c1e21;
+    }
 
-      .list-item {
-        display: block;
-        padding: 10px;
-        margin: 5px 0;
-        text-decoration: none;
-        color: #333;
-        border-radius: 4px;
-        background: #f8f9fa;
-        transition: 0.2s;
-      }
+    .container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
 
-      .list-item:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Menu Simples -->
-    <div style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <a href="{{ url_for('index') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
-      <a href="{{ url_for('user_login') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Administração)</a>
+    .column {
+      background: white;
+      border-radius: 8px;
+      width: 300px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .column h2 {
+      border-bottom: 2px solid;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+
+    .corp-title {
+      color: #2c3e50;
+    }
+
+    .broker-title {
+      color: #3498db;
+    }
+
+    .client-title {
+      color: #27ae60;
+    }
+
+    .list-item {
+      display: block;
+      padding: 10px;
+      margin: 5px 0;
+      text-decoration: none;
+      color: #333;
+      border-radius: 4px;
+      background: #f8f9fa;
+      transition: 0.2s;
+    }
+
+    .list-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Menu Simples -->
+  <div
+    style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <a href="{{ url_for('index') }}"
+      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
+    <a href="{{ url_for('user_login') }}"
+      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Administração)</a>
+  </div>
+
+  <h1>Bem-vindo ao Portal de Gestão</h1>
+  <p style="text-align: center">
+    Selecione um perfil para aceder ao respetivo Dashboard:
+  </p>
+
+  <div class="container">
+    <div class="column">
+      <h2 class="corp-title">🏢 Corporações</h2>
+      <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
+      {% for c in lista_corps %}
+      <a href="/corporation/{{ c.id }}/dashboard" class="list-item">
+        <strong>{{ c.name }}</strong>
+      </a>
+      {% endfor %}
     </div>
 
-    <h1>Bem-vindo ao Portal de Gestão</h1>
-    <p style="text-align: center">
-      Selecione um perfil para aceder ao respetivo Dashboard:
-    </p>
-
-    <div class="container">
-      <div class="column">
-        <h2 class="corp-title">🏢 Corporações</h2>
-        {% for c in lista_corps %}
-        <a href="/corporation/{{ c.id }}/dashboard" class="list-item">
-          <strong>{{ c.name }}</strong>
-        </a>
-        {% endfor %}
-      </div>
-
-      <div class="column">
-        <h2 class="broker-title">💼 Brokers</h2>
-        {% for b in lista_brokers %}
-        <a href="/broker/{{ b.id }}/dashboard" class="list-item">
-          {{ b.name }} <br />
-          <small>Licença: {{ b.license_number }}</small>
-        </a>
-        {% endfor %}
-      </div>
-
-      <div class="column">
-        <h2 class="client-title">👤 Clientes</h2>
-        {% for cl in lista_clients %}
-        <a href="/cliente/{{ cl.id }}/dashboard" class="list-item">
-          {{ cl.name }}
-        </a>
-        {% endfor %}
-      </div>
+    <div class="column">
+      <h2 class="broker-title">💼 Brokers</h2>
+      <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
+      {% for b in lista_brokers %}
+      <a href="/broker/{{ b.id }}/dashboard" class="list-item">
+        {{ b.name }} <br />
+        <small>Licença: {{ b.license_number }}</small>
+      </a>
+      {% endfor %}
     </div>
-  </body>
+
+    <div class="column">
+      <h2 class="client-title">👤 Clientes</h2>
+      <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
+      {% for cl in lista_clients %}
+      <a href="/cliente/{{ cl.id }}/dashboard" class="list-item">
+        {{ cl.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  <script>
+    function filtrar(input) {
+      const termo = input.value.toLowerCase();
+      const items = input.parentElement.querySelectorAll(".list-item");
+      items.forEach((item) => {
+        item.style.display = item.textContent.toLowerCase().includes(termo)
+          ? "block"
+          : "none";
+      });
+    }
+  </script>
+</body>
+
 </html>
