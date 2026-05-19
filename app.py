@@ -94,9 +94,9 @@ def corporation_dashboard(id):
         
         max_conc_pct = (df_b.groupby('client_id')['amount'].sum().max() / b_aum) * 100
         
-        if max_conc_pct > 50:
+        if max_conc_pct > 10:
             status, color = 'ALTO', '#e74c3c'
-        elif max_conc_pct > 25:
+        elif max_conc_pct > 7.5:
             status, color = 'MÉDIO', '#f1c40f'
         else:
             status, color = 'BAIXO', '#27ae60'
@@ -151,7 +151,7 @@ def corporation_dashboard(id):
 @app.route('/broker/<int:id>/dashboard')
 def broker_dashboard(id):
     if id not in Broker.obj:
-        return "Erro: Broker não encontrado!"
+        return "Erro: Broker não encontrado!", 404
     
     broker = Broker.obj[id]
     empresa = Corporation.obj[broker.corporation_id].name if broker.corporation_id in Corporation.obj else "Independente"
@@ -183,7 +183,7 @@ def broker_dashboard(id):
     lista_clientes = sorted(clientes_dict.values(), key=lambda x: x['total'], reverse=True)
     
     if df.empty:
-        return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, ticket_medio=0, num_clientes=0, risco={'nivel': 'N/A'}, graph_html=None, negocios=[], lista_clientes=[])
+        return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, ticket_medio=0, num_clientes=0, risco={'nivel': 'N/A', 'cor': '#95a5a6', 'msg': 'Sem dados suficientes.'}, graph_html=None, negocios=[], lista_clientes=[])
     
     total_aum = df['amount'].sum()
     ticket_medio = df['amount'].mean()
@@ -195,9 +195,9 @@ def broker_dashboard(id):
     percentagem_maior_cliente = (maior_fatia/total_aum)*100
     nome_maior_cliente = df_clientes.loc[df_clientes['amount'].idxmax(),'client_name']
     
-    if percentagem_maior_cliente > 50:
+    if percentagem_maior_cliente > 10:
         risco = {'nivel': 'ALTO', 'cor': '#e74c3c', 'msg': f'Cuidado! {nome_maior_cliente} detém {percentagem_maior_cliente:.1f}% da carteira.'}
-    elif percentagem_maior_cliente > 25:
+    elif percentagem_maior_cliente > 7.5:
         risco = {'nivel': 'MÉDIO', 'cor': '#f1c40f', 'msg': 'Dependência moderada de um único cliente.'}
     else:
         risco = {'nivel': 'BAIXO', 'cor': '#27ae60', 'msg': 'Carteira bem diversificada.'}
@@ -247,15 +247,13 @@ def cliente_dashboard(id):
     if df_all.empty:
         return render_template('cliente_dashboard.html', cliente=cliente, brokers=todos_brokers, negocios=[], total_investido=0, total_negocios=0, graph_html=None)
     
-    df_cliente = df_all[df_all['client_id']==id]
-    
-    if df_cliente.empty:
+    if df_all.empty:
         return render_template('cliente_dashboard.html', cliente=cliente, negocios = [], total_investido=0, graph_html=None)
     
-    total_investido = df_cliente['amount'].sum()
-    total_negocios = len(df_cliente)
+    total_investido = df_all['amount'].sum()
+    total_negocios = len(df_all)
     
-    df_grouped = df_cliente.groupby('broker_name')['amount'].sum().reset_index()
+    df_grouped = df_all.groupby('broker_name')['amount'].sum().reset_index()
     df_grouped = df_grouped[df_grouped['amount'] > 0]
     
     if not df_grouped.empty:
@@ -271,7 +269,7 @@ def cliente_dashboard(id):
     return render_template('cliente_dashboard.html', 
                            cliente=cliente, 
                            brokers=todos_brokers,
-                           negocios=df_cliente.to_dict('records'),
+                           negocios=df_all.to_dict('records'),
                            total_investido=total_investido,
                            total_negocios=total_negocios,
                            graph_html=graph_html)

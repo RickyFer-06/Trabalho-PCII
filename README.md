@@ -3,16 +3,23 @@
 Aplicação web de gestão de corretores, clientes e transações financeiras,
 desenvolvida no âmbito da unidade curricular de PCII.
 
+## Credenciais de Acesso
+
+| Utilizador | Password | Acesso                          |
+|------------|----------|---------------------------------|
+| admin      | admin    | Portal de administração completo |
+| corp       | corp     | Dashboard da primeira corporação |
+| broker     | broker   | Dashboard do primeiro broker     |
+| client     | client   | Dashboard do primeiro cliente    |
+
 ## Funcionalidades
 
 - **Portal de acesso** com pesquisa por Corporação, Broker ou Cliente
-- **Dashboard de Corporação** — visão geral dos brokers, volume total (AUM),
-  ticket médio e análise de risco de concentração por broker
-- **Dashboard de Broker** — carteira de clientes, top 5 por volume e nível de risco
-- **Dashboard de Cliente** — histórico de investimentos, distribuição por corretor
-  e operações de depósito/levantamento em tempo real
-- **Análise de risco automática** com Pandas — classifica carteiras em BAIXO,
-  MÉDIO ou ALTO risco com base na concentração por cliente
+- **Dashboard de Corporação** — visão geral dos brokers, volume total (AUM), ticket médio e risco corporativo (ESTÁVEL / ATENÇÃO / CRÍTICO)
+- **Dashboard de Broker** — carteira de clientes, top 5 por volume e nível de risco de concentração (BAIXO / MÉDIO / ALTO, thresholds: >10% e >7.5%)
+- **Dashboard de Cliente** — histórico de investimentos, distribuição por corretor e operações de depósito/levantamento em tempo real com validação de saldo
+- **Estatísticas globais** — top 10 corporações e top 5 brokers por volume, KPIs gerais do sistema
+- **Análise de risco automática** com Pandas — classifica carteiras em BAIXO, MÉDIO ou ALTO com base na concentração por cliente; risco corporativo agrega o estado de todos os brokers
 - **Gráficos interativos** com Plotly (pie charts e bar charts)
 
 ## Estrutura do projeto
