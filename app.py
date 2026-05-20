@@ -1,4 +1,5 @@
 import os
+import re
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
@@ -25,11 +26,33 @@ Trade.read(db_path)
 
 @app.route('/')
 def home():
-    return redirect(url_for('index'))
+    return redirect(url_for('user_login'))
 
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    mapping = {'high': 'ALTO', 'medium': 'MÉDIO', 'low': 'BAIXO'}
+
+    corps = [Corporation.obj[id] for id in Corporation.lst]
+    for corp in corps:
+        corp.risk_profile = ''
+        if getattr(corp, 'comments', None):
+            m = re.search(r'Risk\s*profile\s*:\s*(High|Medium|Low)', corp.comments, re.IGNORECASE)
+            if m:
+                corp.risk_profile = mapping.get(m.group(1).lower(), '')
+
+    brokers = [Broker.obj[id] for id in Broker.lst]
+    for b in brokers:
+        b_trades = [Trade.obj[t_id] for t_id in Trade.lst if Trade.obj[t_id].broker_id == b.id]
+        b.num_trades = len(b_trades)
+        b.num_clients = len({t.client_id for t in b_trades})
+        b.avg_ticket = sum(t.amount for t in b_trades) / len(b_trades) if b_trades else 0
+
+    clients = [Client.obj[id] for id in Client.lst]
+
+    return render_template('login_simulado.html',
+                           lista_corps=corps,
+                           lista_brokers=brokers,
+                           lista_clients=clients)
 
 @app.route('/user_login')
 def user_login():
@@ -43,15 +66,12 @@ def chklogin():
     if user == 'admin' and password == 'admin':
         return redirect(url_for('login_simulado'))
     elif user == 'corp' and password == 'corp':
-        # Assumiremos a primeira corporation da lista para efeitos de demonstração
         primeira_corp = Corporation.lst[0] if Corporation.lst else 1
         return redirect(url_for('corporation_dashboard', id=primeira_corp))
     elif user == 'broker' and password == 'broker':
-        # Assumiremos o primeiro broker da lista
         primeiro_broker = Broker.lst[0] if Broker.lst else 1
         return redirect(url_for('broker_dashboard', id=primeiro_broker))
     elif user == 'client' and password == 'client':
-        # Assumiremos o primeiro cliente da lista
         primeiro_cliente = Client.lst[0] if Client.lst else 1
         return redirect(url_for('cliente_dashboard', id=primeiro_cliente))
     else:
@@ -59,11 +79,18 @@ def chklogin():
 
 @app.route('/login')
 def login_simulado():
-    
     corps = [Corporation.obj[id] for id in Corporation.lst]
     brokers = [Broker.obj[id] for id in Broker.lst]
     clients = [Client.obj[id] for id in Client.lst]
-    
+
+    mapping = {'high': 'ALTO', 'medium': 'MÉDIO', 'low': 'BAIXO'}
+    for corp in corps:
+        corp.risk_profile = ''
+        if getattr(corp, 'comments', None):
+            m = re.search(r'Risk\s*profile\s*:\s*(High|Medium|Low)', corp.comments, re.IGNORECASE)
+            if m:
+                corp.risk_profile = mapping.get(m.group(1).lower(), '')
+
     return render_template('login_simulado.html', 
                            lista_corps=corps, 
                            lista_brokers=brokers, 
@@ -82,7 +109,6 @@ def corporation_dashboard(id):
     total_trades_list = []
     
     for b in corp_brokers:
-
         b_trades = [Trade.obj[t_id] for t_id in Trade.lst if Trade.obj[t_id].broker_id == b.id]
         
         if not b_trades:
@@ -105,8 +131,6 @@ def corporation_dashboard(id):
         for c_id, group in df_b.groupby('client_id'):
             c_name = Client.obj[c_id].name if c_id in Client.obj else f"Cliente {c_id}"
             clientes_info.append({'name': c_name, 'amount': group['amount'].sum()})
-            
-        # Ordenar os clientes por amount descrescente para melhor visualização
         clientes_info = sorted(clientes_info, key=lambda x: x['amount'], reverse=True)
             
         broker_stats.append({
@@ -157,7 +181,6 @@ def broker_dashboard(id):
     empresa = Corporation.obj[broker.corporation_id].name if broker.corporation_id in Corporation.obj else "Independente"
     
     trades_list = []
-    # Agrupar trades por cliente
     clientes_dict = {}
     
     for t in Trade.obj.values():
@@ -178,8 +201,6 @@ def broker_dashboard(id):
             clientes_dict[t.client_id]['trades'].append(trade_info)
             
     df = pd.DataFrame(trades_list)
-    
-    # Passando a lista de clientes para a view
     lista_clientes = sorted(clientes_dict.values(), key=lambda x: x['total'], reverse=True)
     
     if df.empty:
@@ -202,17 +223,17 @@ def broker_dashboard(id):
     else:
         risco = {'nivel': 'BAIXO', 'cor': '#27ae60', 'msg': 'Carteira bem diversificada.'}
         
-    fig = px.bar(df_clientes.sort_values('amount',ascending=True).tail(5),
-                 x = 'amount', y='client_name', orientation='h',
-                 title= 'Top 5 Clientes por Volume',
-                 labels= {'amount':'Volume(€)','client_name':'Cliente'},
-                 color= 'amount', color_continuous_scale='Blues')
+    fig = px.bar(df_clientes.sort_values('amount', ascending=True).tail(5),
+                 x='amount', y='client_name', orientation='h',
+                 title='Top 5 Clientes por Volume',
+                 labels={'amount': 'Volume(€)', 'client_name': 'Cliente'},
+                 color='amount', color_continuous_scale='Blues')
     
     graph_html = pio.to_html(fig, full_html=False)
     
     return render_template('broker_dashboard.html',
-                           broker = broker,
-                           empresa = empresa,
+                           broker=broker,
+                           empresa=empresa,
                            total_investido=total_aum,
                            ticket_medio=ticket_medio,
                            num_clientes=num_clientes,
@@ -233,7 +254,6 @@ def cliente_dashboard(id):
     for t in Trade.obj.values():
         if t.client_id == id:
             b_name = Broker.obj[t.broker_id].name if t.broker_id in Broker.obj else "Desconhecido"
-            
             trades_data.append({
                 'id': t.id,
                 'broker_name': b_name, 
@@ -247,9 +267,6 @@ def cliente_dashboard(id):
     if df_all.empty:
         return render_template('cliente_dashboard.html', cliente=cliente, brokers=todos_brokers, negocios=[], total_investido=0, total_negocios=0, graph_html=None)
     
-    if df_all.empty:
-        return render_template('cliente_dashboard.html', cliente=cliente, negocios = [], total_investido=0, graph_html=None)
-    
     total_investido = df_all['amount'].sum()
     total_negocios = len(df_all)
     
@@ -261,7 +278,6 @@ def cliente_dashboard(id):
                      title='Distribuição de Investimento por Corretor',
                      hole=0.4,
                      color_discrete_sequence=px.colors.sequential.RdBu)
-        
         graph_html = pio.to_html(fig, full_html=False)
     else:
         graph_html = "<p style='text-align:center; color:#7f8c8d;'>Sem investimentos ativos no momento.</p>"
@@ -280,34 +296,22 @@ def new_trade():
     broker_id = int(request.form.get('broker_id'))
     amount = float(request.form.get('amount'))
     tipo = request.form.get('tipo')
+    data_atual = datetime.now().strftime("%Y-%m-%d")
         
-        # 1. Gerar a data atual no momento do clique
-    data_atual = datetime.now().strftime("%Y-%m-%d") # Podes ajustar o formato (ex: "%d/%m/%Y")
-        
-        # 2. Definir o t.name e ajustar o sinal do amount
     if tipo == 'investir':
         trade_name = "Novo Investimento"
         amount = abs(amount)
     else:
         saldo_neste_broker = sum(t.amount for t in Trade.obj.values() if t.client_id == client_id and t.broker_id == broker_id)
-        
-        # 2. A "Parede de Segurança": Se tentar levantar mais do que tem...
         if amount > saldo_neste_broker:
-            # Retorna uma mensagem de erro simples (no futuro podes fazer isto aparecer num Pop-up bonito)
             return f"<h1>Operação Recusada!</h1><p>Tentou levantar {amount}€, mas o seu saldo no Broker selecionado é de apenas {saldo_neste_broker}€.</p><a href='/cliente/{client_id}/dashboard'>Voltar à Dashboard</a>", 400
         trade_name = "Levantamento"
         amount = -abs(amount)
         
-        # 3. Gerar ID e criar o objeto
     new_id = max(Trade.lst) + 1 if Trade.lst else 1
-        
-        # Substitui pela ordem EXATA dos argumentos do teu __init__ da classe Trade
-        # Assumi que a tua ordem é (id, client_id, broker_id, amount, date, name)
     Trade(new_id, broker_id, client_id, trade_name, data_atual, amount)
     
     query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, '{trade_name}', '{data_atual}', {amount})"
-    
-    # Executamos o comando através da classe Trade (que herdou sqlexe do Gclass)
     Trade.sqlexe(query)
         
     return redirect(url_for('cliente_dashboard', id=client_id))
@@ -357,4 +361,3 @@ def stats():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
-    
