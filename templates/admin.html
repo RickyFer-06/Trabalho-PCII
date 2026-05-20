@@ -91,7 +91,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.9em;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
       transition: 0.2s;
     }
 
@@ -104,9 +104,12 @@
 
 <body>
   <!-- Menu Simples -->
-  <div style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <a href="{{ url_for('index') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
-    <a href="{{ url_for('user_login') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Admin)</a> |
+  <div
+    style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <a href="{{ url_for('index') }}"
+      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
+    <a href="{{ url_for('user_login') }}"
+      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Admin)</a> |
     <a href="/stats" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Estatísticas</a>
   </div>
 
@@ -143,10 +146,8 @@
       </div>
       <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
       {% for b in lista_brokers %}
-      <a href="/broker/{{ b.id }}/dashboard" class="list-item broker-item"
-         data-clientes="{{ b.num_clients }}"
-         data-ticket="{{ b.avg_ticket }}"
-         data-transacoes="{{ b.num_trades }}">
+      <a href="/broker/{{ b.id }}/dashboard" class="list-item broker-item" data-clientes="{{ b.num_clients }}"
+        data-ticket="{{ b.avg_ticket }}" data-transacoes="{{ b.num_trades }}">
         {{ b.name }}<br />
         <small>Licença: {{ b.license_number }}</small>
       </a>
@@ -167,7 +168,6 @@
   </div>
 
   <script>
-    // ── Filtro de texto e risco (Corporações) ──────────────────────────
     function applyFilters(column) {
       const termInput = column.querySelector('.search-input');
       const termo = termInput ? termInput.value.toLowerCase() : '';
@@ -190,7 +190,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      // Toggles de risco (Corporações)
+      // Filtros de risco (Corporações)
       document.querySelectorAll('.risk-filters').forEach(container => {
         container.addEventListener('click', function (e) {
           const btn = e.target.closest('.filter-btn');
@@ -200,40 +200,51 @@
         });
       });
 
-      // ── Ordenação de Brokers ───────────────────────────────────────
-      let currentSort = null;
+      // Sort 3 estados: sem ordem → decrescente → crescente → sem ordem
+      const brokerColumn = document.querySelector('.broker-title').closest('.column');
+      const searchInput = brokerColumn.querySelector('.search-input');
+      const originalOrder = Array.from(brokerColumn.querySelectorAll('.broker-item'));
+      const sortState = {};
 
       document.querySelectorAll('.sort-broker-btn').forEach(btn => {
         btn.addEventListener('click', function () {
           const metric = this.dataset.sort;
-          const column = this.closest('.column');
-          const items = Array.from(column.querySelectorAll('.broker-item'));
 
-          if (this.classList.contains('active')) {
-            // Se já estava selecionado, desativa
-            this.classList.remove('active');
-            currentSort = null;
-
-            // Restaura a ordem original por texto interno
-            items.sort((a, b) => a.textContent.trim().localeCompare(b.textContent.trim()));
-            const searchInput = column.querySelector('.search-input');
-            items.forEach(item => searchInput.insertAdjacentElement('afterend', item));
-            return;
-          }
-
-          currentSort = metric;
-
-          document.querySelectorAll('.sort-broker-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-
-          items.sort((a, b) => {
-            const va = parseFloat(a.dataset[metric]) || 0;
-            const vb = parseFloat(b.dataset[metric]) || 0;
-            return vb - va; // Maior para menor
+          // Reset outros botões
+          document.querySelectorAll('.sort-broker-btn').forEach(b => {
+            if (b !== this) {
+              b.classList.remove('active');
+              b.textContent = b.textContent.replace(' ▼', '').replace(' ▲', '');
+              sortState[b.dataset.sort] = 0;
+            }
           });
 
-          const searchInput = column.querySelector('.search-input');
-          items.reverse().forEach(item => searchInput.insertAdjacentElement('afterend', item));
+          // Ciclo: 0 → 1 (desc) → 2 (asc) → 0
+          sortState[metric] = ((sortState[metric] || 0) + 1) % 3;
+
+          // Atualizar label do botão
+          this.textContent = this.textContent.replace(' ▼', '').replace(' ▲', '');
+          if (sortState[metric] === 1) {
+            this.classList.add('active');
+            this.textContent += ' ▼';
+          } else if (sortState[metric] === 2) {
+            this.classList.add('active');
+            this.textContent += ' ▲';
+          } else {
+            this.classList.remove('active');
+          }
+
+          const currentItems = Array.from(brokerColumn.querySelectorAll('.broker-item'));
+
+          if (sortState[metric] === 0) {
+            originalOrder.forEach(item => brokerColumn.appendChild(item));
+          } else if (sortState[metric] === 1) {
+            currentItems.sort((a, b) => (parseFloat(b.dataset[metric]) || 0) - (parseFloat(a.dataset[metric]) || 0));
+            currentItems.forEach(item => brokerColumn.appendChild(item));
+          } else {
+            currentItems.sort((a, b) => (parseFloat(a.dataset[metric]) || 0) - (parseFloat(b.dataset[metric]) || 0));
+            currentItems.forEach(item => brokerColumn.appendChild(item));
+          }
         });
       });
     });
