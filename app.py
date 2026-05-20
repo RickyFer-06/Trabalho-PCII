@@ -40,7 +40,7 @@ def index():
             if m:
                 corp.risk_profile = mapping.get(m.group(1).lower(), '')
 
-    brokers = [Broker.obj[id] for id in Broker.lst]
+    brokers = [Broker.obj[id] for id in dict.fromkeys(Broker.lst)]
     for b in brokers:
         b_trades = [Trade.obj[t_id] for t_id in Trade.lst if Trade.obj[t_id].broker_id == b.id]
         b.num_trades = len(b_trades)
@@ -80,7 +80,7 @@ def chklogin():
 @app.route('/login')
 def login_simulado():
     corps = [Corporation.obj[id] for id in Corporation.lst]
-    brokers = [Broker.obj[id] for id in Broker.lst]
+    brokers = [Broker.obj[id] for id in dict.fromkeys(Broker.lst)]
     clients = [Client.obj[id] for id in Client.lst]
 
     mapping = {'high': 'ALTO', 'medium': 'MÉDIO', 'low': 'BAIXO'}
@@ -91,18 +91,23 @@ def login_simulado():
             if m:
                 corp.risk_profile = mapping.get(m.group(1).lower(), '')
 
+    for b in brokers:
+        b_trades = [Trade.obj[t_id] for t_id in Trade.lst if Trade.obj[t_id].broker_id == b.id]
+        b.num_trades = len(b_trades)
+        b.num_clients = len({t.client_id for t in b_trades})
+        b.avg_ticket = sum(t.amount for t in b_trades) / len(b_trades) if b_trades else 0
+
     return render_template('login_simulado.html', 
                            lista_corps=corps, 
                            lista_brokers=brokers, 
                            lista_clients=clients)
-    
+
 @app.route('/corporation/<int:id>/dashboard')
 def corporation_dashboard(id):
     if id not in Corporation.obj:
         return "Erro: Corporação não encontrada!", 404
     
     corp = Corporation.obj[id]
-    
     corp_brokers = [Broker.obj[b_id] for b_id in Broker.lst if Broker.obj[b_id].corporation_id == id]
     
     broker_stats = []
@@ -117,7 +122,6 @@ def corporation_dashboard(id):
 
         df_b = pd.DataFrame([{'client_id': t.client_id, 'amount': t.amount} for t in b_trades])
         b_aum = df_b['amount'].sum()
-        
         max_conc_pct = (df_b.groupby('client_id')['amount'].sum().max() / b_aum) * 100
         
         if max_conc_pct > 10:
@@ -209,9 +213,7 @@ def broker_dashboard(id):
     total_aum = df['amount'].sum()
     ticket_medio = df['amount'].mean()
     num_clientes = df['client_name'].nunique()
-    
     df_clientes = df.groupby('client_name')['amount'].sum().reset_index()
-    
     maior_fatia = df_clientes['amount'].max()
     percentagem_maior_cliente = (maior_fatia/total_aum)*100
     nome_maior_cliente = df_clientes.loc[df_clientes['amount'].idxmax(),'client_name']
@@ -228,7 +230,6 @@ def broker_dashboard(id):
                  title='Top 5 Clientes por Volume',
                  labels={'amount': 'Volume(€)', 'client_name': 'Cliente'},
                  color='amount', color_continuous_scale='Blues')
-    
     graph_html = pio.to_html(fig, full_html=False)
     
     return render_template('broker_dashboard.html',
@@ -269,7 +270,6 @@ def cliente_dashboard(id):
     
     total_investido = df_all['amount'].sum()
     total_negocios = len(df_all)
-    
     df_grouped = df_all.groupby('broker_name')['amount'].sum().reset_index()
     df_grouped = df_grouped[df_grouped['amount'] > 0]
     
@@ -289,7 +289,7 @@ def cliente_dashboard(id):
                            total_investido=total_investido,
                            total_negocios=total_negocios,
                            graph_html=graph_html)
-    
+
 @app.route('/trade/new', methods=['POST'])
 def new_trade():
     client_id = int(request.form.get('client_id'))
@@ -310,10 +310,8 @@ def new_trade():
         
     new_id = max(Trade.lst) + 1 if Trade.lst else 1
     Trade(new_id, broker_id, client_id, trade_name, data_atual, amount)
-    
     query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, '{trade_name}', '{data_atual}', {amount})"
     Trade.sqlexe(query)
-        
     return redirect(url_for('cliente_dashboard', id=client_id))
 
 @app.route('/stats')
