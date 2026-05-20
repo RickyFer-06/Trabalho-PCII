@@ -49,6 +49,14 @@
       margin-bottom: 20px;
     }
 
+    .comments-box {
+      background: #ecf0f1;
+      padding: 12px;
+      border-left: 4px solid #3498db;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
     .grid-kpis {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -123,8 +131,11 @@
 </head>
 
 <body>
+  <div style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <a href="{{ url_for('index') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
+    <a href="{{ url_for('user_login') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Broker)</a>
+  </div>
   <div class="container">
-    <a href="/login" class="btn-voltar">← Voltar</a>
 
     <div class="header">
       <h1>
@@ -134,6 +145,13 @@
       <p>Empresa: {{ empresa }} | Licença: #{{ broker.license_number }}</p>
       <small style="color: #bdc3c7">⚠️ {{ risco.msg }}</small>
     </div>
+
+    {% if broker.comments %}
+    <div class="comments-box">
+      <strong>📝 Comentários de Broker:</strong><br />
+      <i>{{ broker.comments }}</i>
+    </div>
+    {% endif %}
 
     <div class="grid-kpis">
       <div class="card">

@@ -27,7 +27,7 @@
     .column {
       background: white;
       border-radius: 8px;
-      width: 300px;
+      width: 400px;
       padding: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -106,7 +106,7 @@
   <!-- Menu Simples -->
   <div style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
     <a href="{{ url_for('index') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
-    <a href="{{ url_for('user_login') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Administração)</a> |
+    <a href="{{ url_for('user_login') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Admin)</a> |
     <a href="/stats" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Estatísticas</a>
   </div>
 
@@ -202,7 +202,6 @@
 
       // ── Ordenação de Brokers ───────────────────────────────────────
       let currentSort = null;
-      let ascending = false;
 
       document.querySelectorAll('.sort-broker-btn').forEach(btn => {
         btn.addEventListener('click', function () {
@@ -210,12 +209,19 @@
           const column = this.closest('.column');
           const items = Array.from(column.querySelectorAll('.broker-item'));
 
-          if (currentSort === metric) {
-            ascending = !ascending;
-          } else {
-            currentSort = metric;
-            ascending = false;
+          if (this.classList.contains('active')) {
+            // Se já estava selecionado, desativa
+            this.classList.remove('active');
+            currentSort = null;
+
+            // Restaura a ordem original por texto interno
+            items.sort((a, b) => a.textContent.trim().localeCompare(b.textContent.trim()));
+            const searchInput = column.querySelector('.search-input');
+            items.forEach(item => searchInput.insertAdjacentElement('afterend', item));
+            return;
           }
+
+          currentSort = metric;
 
           document.querySelectorAll('.sort-broker-btn').forEach(b => b.classList.remove('active'));
           this.classList.add('active');
@@ -223,7 +229,7 @@
           items.sort((a, b) => {
             const va = parseFloat(a.dataset[metric]) || 0;
             const vb = parseFloat(b.dataset[metric]) || 0;
-            return ascending ? va - vb : vb - va;
+            return vb - va; // Maior para menor
           });
 
           const searchInput = column.querySelector('.search-input');

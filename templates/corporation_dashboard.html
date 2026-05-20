@@ -119,16 +119,21 @@
 </head>
 
 <body>
+  <div style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <a href="{{ url_for('index') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
+    <a href="{{ url_for('user_login') }}" style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Corporação)</a>
+  </div>
   <div class="container">
-    <a href="/login" class="btn-voltar">← Voltar</a>
 
     <div class="header">
       <span class="risk-badge" style="background: {{ risk.cor }}">RISCO CORPORATIVO: {{ risk.nivel }}</span>
       <h1>{{ corp.name }}</h1>
+      {% if corp.comments %}
       <div class="comments-box">
-        <strong>📝 Comentários da Administração:</strong><br />
+        <strong>📝 Comentários de Corporação:</strong><br />
         <i>{{ corp.comments }}</i>
       </div>
+      {% endif %}
       <p style="margin-top: 15px; font-size: 0.9em; color: #bdc3c7">
         {{ risk.msg }}
       </p>

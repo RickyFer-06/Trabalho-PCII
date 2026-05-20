@@ -26,33 +26,11 @@ Trade.read(db_path)
 
 @app.route('/')
 def home():
-    return redirect(url_for('user_login'))
+    return redirect(url_for('index'))
 
 @app.route('/index')
 def index():
-    mapping = {'high': 'ALTO', 'medium': 'MÉDIO', 'low': 'BAIXO'}
-
-    corps = [Corporation.obj[id] for id in Corporation.lst]
-    for corp in corps:
-        corp.risk_profile = ''
-        if getattr(corp, 'comments', None):
-            m = re.search(r'Risk\s*profile\s*:\s*(High|Medium|Low)', corp.comments, re.IGNORECASE)
-            if m:
-                corp.risk_profile = mapping.get(m.group(1).lower(), '')
-
-    brokers = [Broker.obj[id] for id in dict.fromkeys(Broker.lst)]
-    for b in brokers:
-        b_trades = [Trade.obj[t_id] for t_id in Trade.lst if Trade.obj[t_id].broker_id == b.id]
-        b.num_trades = len(b_trades)
-        b.num_clients = len({t.client_id for t in b_trades})
-        b.avg_ticket = sum(t.amount for t in b_trades) / len(b_trades) if b_trades else 0
-
-    clients = [Client.obj[id] for id in Client.lst]
-
-    return render_template('login_simulado.html',
-                           lista_corps=corps,
-                           lista_brokers=brokers,
-                           lista_clients=clients)
+    return render_template('index.html')
 
 @app.route('/user_login')
 def user_login():
@@ -64,7 +42,7 @@ def chklogin():
     password = request.form.get('password')
     
     if user == 'admin' and password == 'admin':
-        return redirect(url_for('login_simulado'))
+        return redirect(url_for('admin'))
     elif user == 'corp' and password == 'corp':
         primeira_corp = Corporation.lst[0] if Corporation.lst else 1
         return redirect(url_for('corporation_dashboard', id=primeira_corp))
@@ -77,8 +55,8 @@ def chklogin():
     else:
         return render_template('login.html', user=user, password=password, resul='Credenciais inválidas. Tente novamente!')
 
-@app.route('/login')
-def login_simulado():
+@app.route('/admin')
+def admin():
     corps = [Corporation.obj[id] for id in Corporation.lst]
     brokers = [Broker.obj[id] for id in dict.fromkeys(Broker.lst)]
     clients = [Client.obj[id] for id in Client.lst]
@@ -97,7 +75,7 @@ def login_simulado():
         b.num_clients = len({t.client_id for t in b_trades})
         b.avg_ticket = sum(t.amount for t in b_trades) / len(b_trades) if b_trades else 0
 
-    return render_template('login_simulado.html', 
+    return render_template('admin.html', 
                            lista_corps=corps, 
                            lista_brokers=brokers, 
                            lista_clients=clients)
