@@ -86,7 +86,7 @@ def corporation_dashboard(id):
         return "Erro: Corporação não encontrada!", 404
     
     corp = Corporation.obj[id]
-    corp_brokers = [Broker.obj[b_id] for b_id in Broker.lst if Broker.obj[b_id].corporation_id == id]
+    corp_brokers = [Broker.obj[b_id] for b_id in dict.fromkeys(Broker.lst) if Broker.obj[b_id].corporation_id == id]
     
     broker_stats = []
     total_trades_list = []
