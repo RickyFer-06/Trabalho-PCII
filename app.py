@@ -53,7 +53,7 @@ def chklogin():
         primeiro_cliente = Client.lst[0] if Client.lst else 1
         return redirect(url_for('cliente_dashboard', id=primeiro_cliente))
     else:
-        return render_template('login.html', user=user, password=password, resul='Credenciais inválidas. Tente novamente!')
+        return render_template('login.html', user=user, password='', resul='Credenciais inválidas. Tente novamente!')
 
 @app.route('/admin')
 def admin():
