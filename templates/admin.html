@@ -221,31 +221,28 @@
     }
 
     function filtrar(input) {
-      applyFilters(input.parentElement);
+      applyFilters(input.closest('.column'));
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      // Filtros de risco (Corporações)
       document.querySelectorAll('.risk-filters').forEach(container => {
         container.addEventListener('click', function (e) {
           const btn = e.target.closest('.filter-btn');
           if (!btn || btn.classList.contains('sort-broker-btn')) return;
           btn.classList.toggle('active');
-          applyFilters(container.parentElement);
+          applyFilters(container.closest('.column'));
         });
       });
 
-      // Sort 3 estados: sem ordem → decrescente → crescente → sem ordem
       const brokerColumn = document.querySelector('.broker-title').closest('.column');
-      const searchInput = brokerColumn.querySelector('.search-input');
-      const originalOrder = Array.from(brokerColumn.querySelectorAll('.broker-item'));
+      const scrollArea = brokerColumn.querySelector('.scroll-area');
+      const originalOrder = Array.from(scrollArea.querySelectorAll('.broker-item'));
       const sortState = {};
 
       document.querySelectorAll('.sort-broker-btn').forEach(btn => {
         btn.addEventListener('click', function () {
           const metric = this.dataset.sort;
 
-          // Reset outros botões
           document.querySelectorAll('.sort-broker-btn').forEach(b => {
             if (b !== this) {
               b.classList.remove('active');
@@ -254,10 +251,8 @@
             }
           });
 
-          // Ciclo: 0 → 1 (desc) → 2 (asc) → 0
           sortState[metric] = ((sortState[metric] || 0) + 1) % 3;
 
-          // Atualizar label do botão
           this.textContent = this.textContent.replace(' ▼', '').replace(' ▲', '');
           if (sortState[metric] === 1) {
             this.classList.add('active');
@@ -269,16 +264,16 @@
             this.classList.remove('active');
           }
 
-          const currentItems = Array.from(brokerColumn.querySelectorAll('.broker-item'));
+          const currentItems = Array.from(scrollArea.querySelectorAll('.broker-item'));
 
           if (sortState[metric] === 0) {
-            originalOrder.forEach(item => brokerColumn.appendChild(item));
+            originalOrder.forEach(item => scrollArea.appendChild(item));
           } else if (sortState[metric] === 1) {
             currentItems.sort((a, b) => (parseFloat(b.dataset[metric]) || 0) - (parseFloat(a.dataset[metric]) || 0));
-            currentItems.forEach(item => brokerColumn.appendChild(item));
+            currentItems.forEach(item => scrollArea.appendChild(item));
           } else {
             currentItems.sort((a, b) => (parseFloat(a.dataset[metric]) || 0) - (parseFloat(b.dataset[metric]) || 0));
-            currentItems.forEach(item => brokerColumn.appendChild(item));
+            currentItems.forEach(item => scrollArea.appendChild(item));
           }
         });
       });
