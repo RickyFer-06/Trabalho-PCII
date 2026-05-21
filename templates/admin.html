@@ -22,6 +22,7 @@
       gap: 20px;
       justify-content: center;
       margin-top: 30px;
+      align-items: stretch;
     }
 
     .column {
@@ -30,6 +31,8 @@
       width: 400px;
       padding: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
     }
 
     .column h2 {
@@ -69,18 +72,28 @@
     .search-input {
       width: 100%;
       padding: 8px;
-      margin-bottom: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
       font-size: 0.9em;
     }
 
+    .column-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .risk-filters {
       display: flex;
       gap: 8px;
-      margin-bottom: 10px;
       flex-wrap: wrap;
+      min-height: 40px;
+      align-items: center;
+    }
+
+    .filters-spacer {
+      visibility: hidden;
     }
 
     .filter-btn {
@@ -98,6 +111,14 @@
     .filter-btn.active {
       background: #0d6efd;
       color: white;
+    }
+
+    .scroll-area {
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 6px;
+      flex-grow: 1;
+      min-height: 0;
     }
   </style>
 </head>
@@ -123,46 +144,60 @@
     <!-- CORPORAÇÕES -->
     <div class="column">
       <h2 class="corp-title">🏢 Corporações</h2>
-      <div class="risk-filters">
-        <button type="button" class="filter-btn" data-risk="ALTO">High Risk</button>
-        <button type="button" class="filter-btn" data-risk="MÉDIO">Medium Risk</button>
-        <button type="button" class="filter-btn" data-risk="BAIXO">Low Risk</button>
+      <div class="column-controls">
+        <div class="risk-filters">
+          <button type="button" class="filter-btn" data-risk="ALTO">High Risk</button>
+          <button type="button" class="filter-btn" data-risk="MÉDIO">Medium Risk</button>
+          <button type="button" class="filter-btn" data-risk="BAIXO">Low Risk</button>
+        </div>
+        <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
       </div>
-      <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
-      {% for c in lista_corps %}
-      <a href="/corporation/{{ c.id }}/dashboard" class="list-item" data-risk="{{ c.risk_profile }}">
-        <strong>{{ c.name }}</strong>
-      </a>
-      {% endfor %}
+      <div class="scroll-area">
+        {% for c in lista_corps %}
+        <a href="/corporation/{{ c.id }}/dashboard" class="list-item" data-risk="{{ c.risk_profile }}">
+          <strong>{{ c.name }}</strong>
+        </a>
+        {% endfor %}
+      </div>
     </div>
 
     <!-- BROKERS -->
     <div class="column">
       <h2 class="broker-title">💼 Brokers</h2>
-      <div class="risk-filters">
-        <button type="button" class="filter-btn sort-broker-btn" data-sort="clientes">Clientes Ativos</button>
-        <button type="button" class="filter-btn sort-broker-btn" data-sort="ticket">Ticket Médio</button>
-        <button type="button" class="filter-btn sort-broker-btn" data-sort="transacoes">Nº Transações</button>
+      <div class="column-controls">
+        <div class="risk-filters">
+          <button type="button" class="filter-btn sort-broker-btn" data-sort="clientes">Clientes Ativos</button>
+          <button type="button" class="filter-btn sort-broker-btn" data-sort="ticket">Ticket Médio</button>
+          <button type="button" class="filter-btn sort-broker-btn" data-sort="transacoes">Nº Transações</button>
+        </div>
+        <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
       </div>
-      <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
-      {% for b in lista_brokers %}
-      <a href="/broker/{{ b.id }}/dashboard" class="list-item broker-item" data-clientes="{{ b.num_clients }}"
-        data-ticket="{{ b.avg_ticket }}" data-transacoes="{{ b.num_trades }}">
-        {{ b.name }}<br />
-        <small>Licença: {{ b.license_number }}</small>
-      </a>
-      {% endfor %}
+      <div class="scroll-area">
+        {% for b in lista_brokers %}
+        <a href="/broker/{{ b.id }}/dashboard" class="list-item broker-item" data-clientes="{{ b.num_clients }}"
+          data-ticket="{{ b.avg_ticket }}" data-transacoes="{{ b.num_trades }}">
+          {{ b.name }}<br />
+          <small>Licença: {{ b.license_number }}</small>
+        </a>
+        {% endfor %}
+      </div>
     </div>
 
     <!-- CLIENTES -->
     <div class="column">
       <h2 class="client-title">👤 Clientes</h2>
-      <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
-      {% for cl in lista_clients %}
-      <a href="/cliente/{{ cl.id }}/dashboard" class="list-item">
-        {{ cl.name }}
-      </a>
-      {% endfor %}
+      <div class="column-controls">
+        <div class="risk-filters filters-spacer"></div>
+        <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
+      </div>
+      <div class="scroll-area">
+        {% for cl in lista_clients %}
+        <a href="/cliente/{{ cl.id }}/dashboard" class="list-item">
+          {{ cl.name }}<br />
+          <small>Morada: {{ cl.address }}</small>
+        </a>
+        {% endfor %}
+      </div>
     </div>
 
   </div>
