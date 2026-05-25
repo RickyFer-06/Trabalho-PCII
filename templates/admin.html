@@ -245,7 +245,7 @@
               <input name="comments" placeholder="Notas">
               <button type="submit" class="btn-add">Adicionar</button>
             </form>
-            <form action="/admin/corporation/remove" method="POST">
+            <form action="/admin/corporation/remove" method="POST" onsubmit="return confirmarRemocao(this, 'corporação e todos os seus brokers e transações')">
               <label>Remover corporação</label>
               <select name="corp_id" required>
                 <option value="" disabled selected>Escolher...</option>
@@ -297,7 +297,7 @@
               </select>
               <button type="submit" class="btn-add">Adicionar</button>
             </form>
-            <form action="/admin/broker/remove" method="POST">
+            <form action="/admin/broker/remove" method="POST" onsubmit="return confirmarRemocao(this, 'broker e todas as suas transações')">
               <label>Remover broker</label>
               <select name="broker_id" required>
                 <option value="" disabled selected>Escolher...</option>
@@ -344,7 +344,7 @@
               <input name="address" placeholder="Morada" required>
               <button type="submit" class="btn-add">Adicionar</button>
             </form>
-            <form action="/admin/client/remove" method="POST">
+            <form action="/admin/client/remove" method="POST" onsubmit="return confirmarRemocao(this, 'cliente e todas as suas transações')">
               <label>Remover cliente</label>
               <select name="client_id" required>
                 <option value="" disabled selected>Escolher...</option>
@@ -510,6 +510,16 @@
         });
       });
     });
+  </script>
+
+  <script>
+    function confirmarRemocao(form, tipo) {
+      const select = form.querySelector('select');
+      const nome = select.options[select.selectedIndex].text;
+      return confirm('Remover "' + nome + '"?
+
+Esta ação apagará permanentemente a ' + tipo + '.');
+    }
   </script>
 </body>
 

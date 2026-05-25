@@ -142,12 +142,15 @@
 
         <div id="wrapperRemover" style="display: none;">
           <label>Selecione um Cliente para Remover:</label>
-          <select id="selectRemover">
+          <select id="selectRemover" onchange="mostrarAvisoRemover(this)">
             <option value="" disabled selected>-- Escolha o Cliente --</option>
             {% for c in clientes_atuais %}
-            <option value="{{ c.id }}">{{ c.name }}</option>
+            <option value="{{ c.id }}" data-total="{{ c.total | moeda }}">{{ c.name }}</option>
             {% endfor %}
           </select>
+          <div id="avisoRemover" class="aviso-remover" style="display: none;">
+            ⚠️ Serão apagadas <strong id="totalRemover"></strong> em transações. Esta ação é irreversível.
+          </div>
         </div>
 
         <button type="submit" class="btn-executar" id="btnExecutar">Confirmar</button>

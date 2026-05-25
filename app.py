@@ -108,6 +108,17 @@ def admin_remove_corporation():
     if corp_id not in Corporation.obj:
         return "Corporação não encontrada.", 404
 
+    broker_ids = [bid for bid in list(Broker.lst) if Broker.obj[bid].corporation_id == corp_id]
+    for bid in broker_ids:
+        trade_ids = [tid for tid in list(Trade.lst) if Trade.obj[tid].broker_id == bid]
+        for tid in trade_ids:
+            Trade.lst.remove(tid)
+            del Trade.obj[tid]
+        Trade.sqlexe(f"DELETE FROM Trade WHERE broker_id={bid}")
+        Broker.lst.remove(bid)
+        del Broker.obj[bid]
+    Broker.sqlexe(f"DELETE FROM Broker WHERE corporation_id={corp_id}")
+
     Corporation.remove(corp_id)
     return redirect(url_for('admin'))
 
@@ -135,6 +146,12 @@ def admin_remove_broker():
     if broker_id not in Broker.obj:
         return "Broker não encontrado.", 404
 
+    trade_ids = [tid for tid in list(Trade.lst) if Trade.obj[tid].broker_id == broker_id]
+    for tid in trade_ids:
+        Trade.lst.remove(tid)
+        del Trade.obj[tid]
+    Trade.sqlexe(f"DELETE FROM Trade WHERE broker_id={broker_id}")
+
     Broker.remove(broker_id)
     return redirect(url_for('admin'))
 
@@ -160,6 +177,12 @@ def admin_remove_client():
     client_id = int(client_id)
     if client_id not in Client.obj:
         return "Cliente não encontrado.", 404
+
+    trade_ids = [tid for tid in list(Trade.lst) if Trade.obj[tid].client_id == client_id]
+    for tid in trade_ids:
+        Trade.lst.remove(tid)
+        del Trade.obj[tid]
+    Trade.sqlexe(f"DELETE FROM Trade WHERE client_id={client_id}")
 
     Client.remove(client_id)
     return redirect(url_for('admin'))
@@ -272,9 +295,12 @@ def broker_dashboard(id):
     lista_clientes = sorted(clientes_dict.values(), key=lambda x: x['total'], reverse=True)
     
     clientes_atuais_ids = set(clientes_dict.keys())
-    
-    clientes_atuais = [Client.obj[cid] for cid in clientes_atuais_ids if cid in Client.obj]
-    clientes_atuais = sorted(clientes_atuais, key=lambda c: c.name.lower())
+
+    clientes_atuais = sorted(
+        [{'id': cid, 'name': Client.obj[cid].name, 'total': clientes_dict[cid]['total']}
+         for cid in clientes_atuais_ids if cid in Client.obj],
+        key=lambda c: c['name'].lower()
+    )
     
     clientes_disponiveis = [Client.obj[cid] for cid in Client.lst if cid not in clientes_atuais_ids and cid in Client.obj]
     clientes_disponiveis = sorted(clientes_disponiveis, key=lambda c: c.name.lower())
@@ -282,6 +308,7 @@ def broker_dashboard(id):
     if df.empty:
         todos_globais = sorted([Client.obj[cid] for cid in Client.lst if cid in Client.obj], key=lambda c: c.name.lower())
         return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, ticket_medio=0, num_clientes=0, risco={'nivel': 'N/A', 'cor': '#95a5a6', 'msg': 'Sem dados suficientes.'}, graph_html=None, negocios=[], lista_clientes=[], clientes_atuais=[], clientes_disponiveis=todos_globais)
+
     
     total_aum = df['amount'].sum()
     ticket_medio = df['amount'].mean()
@@ -331,8 +358,8 @@ def manage_client():
     if action == 'adicionar':
         # Criação de um trade dummy de 0€ para forçar a associação no portfolio
         new_id = max(Trade.lst) + 1 if Trade.lst else 1
-        Trade(new_id, broker_id, client_id, "Associação de Portefólio", data_atual, 0.0)
-        query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, 'Associação de Portefólio', '{data_atual}', 0.0)"
+        Trade(new_id, broker_id, client_id, "Entrada na Carteira", data_atual, 0.0)
+        query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, 'Entrada na Carteira', '{data_atual}', 0.0)"
         Trade.sqlexe(query)
         
     elif action == 'remover':

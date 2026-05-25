@@ -12,6 +12,8 @@ function openModal(tipo) {
     let wRem = document.getElementById("wrapperRemover");
     let sRem = document.getElementById("selectRemover");
 
+    document.getElementById("avisoRemover").style.display = "none";
+
     if (tipo === "adicionar") {
         document.getElementById("modalTitle").innerText = "👥 Associar Novo Cliente";
         document.getElementById("btnExecutar").style.background = "#27ae60";
@@ -41,6 +43,18 @@ function openModal(tipo) {
 
 function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
+}
+
+function mostrarAvisoRemover(select) {
+    const aviso = document.getElementById("avisoRemover");
+    const totalEl = document.getElementById("totalRemover");
+    const selected = select.options[select.selectedIndex];
+    if (selected && selected.dataset.total) {
+        totalEl.textContent = selected.dataset.total;
+        aviso.style.display = "block";
+    } else {
+        aviso.style.display = "none";
+    }
 }
 
 window.onclick = function (event) {

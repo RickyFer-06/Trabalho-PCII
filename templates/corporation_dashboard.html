@@ -148,33 +148,13 @@
     </div>
 
     <button type="button" class="drawer-item" onclick="toggleCorpDrawer()">
-      <img src="{{ url_for('static', filename='images/heavy-multiplication-x-2716.jpg') }}" alt="Close"
+      <img src="{{ url_for('static', filename='images/heavy-multiplication-x-2716.png') }}" alt="Close"
         class="emoji-icon">
       Fechar menu
     </button>
   </div>
 
-  <script>
-    function toggleCorpDrawer() {
-      document.getElementById("corpDrawer").classList.toggle("active");
-    }
-
-    function showCorpSection(id) {
-      const sections = document.querySelectorAll(".drawer-section");
-      const buttons = document.querySelectorAll(".drawer-toggle");
-      sections.forEach(section => section.classList.remove("active"));
-      buttons.forEach(button => button.classList.remove("active"));
-      const activeSection = document.getElementById(id);
-      if (activeSection) {
-        activeSection.classList.add("active");
-      }
-      buttons.forEach(button => {
-        if (button.dataset.target === id) {
-          button.classList.add("active");
-        }
-      });
-    }
-  </script>
+  <script src="{{ url_for('static', filename='js/corporation_dashboard.js') }}"></script>
 </body>
 
 </html>
