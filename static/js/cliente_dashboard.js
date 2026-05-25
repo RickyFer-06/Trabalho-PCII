@@ -10,12 +10,12 @@ function openModal(tipo) {
     // Alterar o visual consoante a escolha (Depositar vs Levantar)
     if (tipo === "investir") {
         document.getElementById("modalTitle").innerText =
-            "🛒 Adicionar Fundo";
+            "Adicionar Fundo";
         document.getElementById("btnExecutar").style.background = "#27ae60"; // Verde
         document.getElementById("btnExecutar").innerText =
             "Confirmar Depósito";
     } else {
-        document.getElementById("modalTitle").innerText = "💸 Resgatar Fundo";
+        document.getElementById("modalTitle").innerText = "Resgatar Fundo";
         document.getElementById("btnExecutar").style.background = "#e74c3c"; // Vermelho
         document.getElementById("btnExecutar").innerText =
             "Solicitar Levantamento";

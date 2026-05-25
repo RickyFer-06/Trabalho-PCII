@@ -20,6 +20,16 @@
 
     <h1>Bem-vindo, {{ cliente.name }}</h1>
 
+<<<<<<< Updated upstream
+=======
+    {% if cliente.comments %}
+    <div class="comments-box">
+      <strong><img src="{{ url_for('static', filename='images/memo-1f4dd.jpg') }}" alt="Memo" class="emoji-icon">
+        Comentários de Cliente:</strong><br />
+      <i>{{ cliente.comments }}</i>
+    </div>
+    {% endif %}
+>>>>>>> Stashed changes
 
     <div class="kpi-container">
       <div class="card">
@@ -67,13 +77,18 @@
 
   <div id="drawer" class="side-drawer">
     <div class="drawer-item" onclick="openModal('investir')">
-      💰 Adicionar Fundos
+      <img src="{{ url_for('static', filename='images/moneybag-1f4b0.jpg') }}" alt="Money bag" class="emoji-icon">
+      Adicionar Fundos
     </div>
     <div class="drawer-item" onclick="openModal('levantar')">
-      💸 Levantar Fundos
+      <img src="{{ url_for('static', filename='images/money-with-wings-1f4b8.jpg') }}" alt="Money with wings"
+        class="emoji-icon">
+      Levantar Fundos
     </div>
     <div class="drawer-item drawer-close" onclick="toggleDrawer()">
-      ✖ Fechar Menu
+      <img src="{{ url_for('static', filename='images/heavy-multiplication-x-2716.jpg') }}" alt="Close"
+        class="emoji-icon">
+      Fechar Menu
     </div>
   </div>
 

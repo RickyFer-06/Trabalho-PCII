@@ -41,6 +41,13 @@
       margin-top: 0;
     }
 
+    .emoji-icon {
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.15em;
+      margin-right: 0.2em;
+    }
+
     .column-header {
       display: flex;
       align-items: center;
@@ -226,7 +233,8 @@
     <!-- CORPORAÇÕES -->
     <div class="column">
       <div class="column-header">
-        <h2 class="corp-title">🏢 Corporações</h2>
+        <h2 class="corp-title"><img src="{{ url_for('static', filename='images/office-building-1f3e2.jpg') }}"
+          alt="Office building" class="emoji-icon"> Corporações</h2>
         <details class="mini-menu">
           <summary>Gerir</summary>
           <div class="menu-panel">
@@ -270,7 +278,8 @@
     <!-- BROKERS -->
     <div class="column">
       <div class="column-header">
-        <h2 class="broker-title">💼 Brokers</h2>
+        <h2 class="broker-title"><img src="{{ url_for('static', filename='images/briefcase-1f4bc.jpg') }}"
+          alt="Briefcase" class="emoji-icon"> Brokers</h2>
         <details class="mini-menu">
           <summary>Gerir</summary>
           <div class="menu-panel">
@@ -323,7 +332,8 @@
     <!-- CLIENTES -->
     <div class="column">
       <div class="column-header">
-        <h2 class="client-title">👤 Clientes</h2>
+        <h2 class="client-title"><img src="{{ url_for('static', filename='images/bust-in-silhouette-1f464.jpg') }}"
+          alt="Client" class="emoji-icon"> Clientes</h2>
         <details class="mini-menu">
           <summary>Gerir</summary>
           <div class="menu-panel">

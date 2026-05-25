@@ -22,9 +22,20 @@
         <span class="risk-badge" style="background-color: {{ risco.cor }}">RISCO {{ risco.nivel }}</span>
       </h1>
       <p>Empresa: {{ empresa }} | Licença: #{{ broker.license_number }}</p>
-      <small class="header-note">⚠️ {{ risco.msg }}</small>
+          <small class="header-note"><img src="{{ url_for('static', filename='images/warning-26a0.png') }}" alt="Warning"
+          class="emoji-icon"> {{ risco.msg }}</small>
     </div>
 
+<<<<<<< Updated upstream
+=======
+    {% if broker.comments %}
+    <div class="comments-box">
+      <strong><img src="{{ url_for('static', filename='images/memo-1f4dd.jpg') }}" alt="Memo" class="emoji-icon">
+        Comentários de Broker:</strong><br />
+      <i>{{ broker.comments }}</i>
+    </div>
+    {% endif %}
+>>>>>>> Stashed changes
 
     <div class="grid-kpis">
       <div class="card">

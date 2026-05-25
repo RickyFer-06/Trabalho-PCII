@@ -21,8 +21,8 @@
       <h1>{{ corp.name }}</h1>
       {% if corp.comments %}
       <div class="comments-box">
-        <strong>📝 Comentários de Corporação:</strong><br />
-        <i>{{ corp.comments }}</i>
+        <strong><img src="{{ url_for('static', filename='images/memo-1f4dd.jpg') }}" alt="Memo" class="emoji-icon">
+          Risco corporativo: {{ risk.nivel }}</strong><br />
       </div>
       {% endif %}
       <p style="margin-top: 15px; font-size: 0.9em; color: #bdc3c7">
