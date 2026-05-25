@@ -414,7 +414,7 @@ def cliente_dashboard(id):
     
     if not df_all.empty:
         df_grouped = df_all.groupby('broker_name')['amount'].sum().reset_index()
-        df_grouped = df_grouped[df_grouped['amount'] > 0]©
+        df_grouped = df_grouped[df_grouped['amount'] > 0]
         
         if not df_grouped.empty:
             fig = px.pie(df_grouped, values='amount', names='broker_name',
