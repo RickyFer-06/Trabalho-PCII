@@ -5,6 +5,15 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.navbar-logo {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    height: 28px;
+    transform: translateY(-50%);
 }
 
 .navbar a {
