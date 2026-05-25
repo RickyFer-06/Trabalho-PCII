@@ -271,8 +271,17 @@ def broker_dashboard(id):
     df = pd.DataFrame(trades_list)
     lista_clientes = sorted(clientes_dict.values(), key=lambda x: x['total'], reverse=True)
     
+    clientes_atuais_ids = set(clientes_dict.keys())
+    
+    clientes_atuais = [Client.obj[cid] for cid in clientes_atuais_ids if cid in Client.obj]
+    clientes_atuais = sorted(clientes_atuais, key=lambda c: c.name.lower())
+    
+    clientes_disponiveis = [Client.obj[cid] for cid in Client.lst if cid not in clientes_atuais_ids and cid in Client.obj]
+    clientes_disponiveis = sorted(clientes_disponiveis, key=lambda c: c.name.lower())
+
     if df.empty:
-        return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, ticket_medio=0, num_clientes=0, risco={'nivel': 'N/A', 'cor': '#95a5a6', 'msg': 'Sem dados suficientes.'}, graph_html=None, negocios=[], lista_clientes=[])
+        todos_globais = sorted([Client.obj[cid] for cid in Client.lst if cid in Client.obj], key=lambda c: c.name.lower())
+        return render_template('broker_dashboard.html', broker=broker, empresa=empresa, total_investido=0, ticket_medio=0, num_clientes=0, risco={'nivel': 'N/A', 'cor': '#95a5a6', 'msg': 'Sem dados suficientes.'}, graph_html=None, negocios=[], lista_clientes=[], clientes_atuais=[], clientes_disponiveis=todos_globais)
     
     total_aum = df['amount'].sum()
     ticket_medio = df['amount'].mean()
@@ -308,7 +317,37 @@ def broker_dashboard(id):
                            risco=risco,
                            graph_html=graph_html,
                            negocios=trades_list,
-                           lista_clientes=lista_clientes)
+                           lista_clientes=lista_clientes,
+                           clientes_atuais=clientes_atuais,        
+                           clientes_disponiveis=clientes_disponiveis)
+
+@app.route('/broker/manage_client', methods=['POST'])
+def manage_client():
+    broker_id = int(request.form.get('broker_id'))
+    client_id = int(request.form.get('client_id'))
+    action = request.form.get('action_type')
+    data_atual = datetime.now().strftime("%Y-%m-%d")
+
+    if action == 'adicionar':
+        # Criação de um trade dummy de 0€ para forçar a associação no portfolio
+        new_id = max(Trade.lst) + 1 if Trade.lst else 1
+        Trade(new_id, broker_id, client_id, "Associação de Portefólio", data_atual, 0.0)
+        query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, 'Associação de Portefólio', '{data_atual}', 0.0)"
+        Trade.sqlexe(query)
+        
+    elif action == 'remover':
+        # Removemos todos os "trades" em memória
+        trades_to_remove = [t_id for t_id, t in Trade.obj.items() if t.broker_id == broker_id and t.client_id == client_id]
+        for t_id in trades_to_remove:
+            if t_id in Trade.obj:
+                del Trade.obj[t_id]
+            if t_id in Trade.lst:
+                Trade.lst.remove(t_id)
+        # Apagamos da DB
+        Trade.sqlexe(f"DELETE FROM Trade WHERE broker_id={broker_id} AND client_id={client_id}")
+
+    return redirect(url_for('broker_dashboard', id=broker_id))
+
 
 @app.route('/cliente/<int:id>/dashboard')
 def cliente_dashboard(id):
