@@ -20,13 +20,6 @@
 
     <h1>Bem-vindo, {{ cliente.name }}</h1>
 
-    {% if cliente.comments %}
-    <div class="comments-box">
-      <strong><img src="{{ url_for('static', filename='images/memo-1f4dd.jpg') }}" alt="Memo" class="emoji-icon">
-        Comentários de Cliente:</strong><br />
-      <i>{{ cliente.comments }}</i>
-    </div>
-    {% endif %}
 
     <div class="kpi-container">
       <div class="card">
