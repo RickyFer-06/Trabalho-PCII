@@ -225,6 +225,8 @@ def corporation_dashboard(id):
     df_plot = pd.DataFrame([{'Broker': s['obj'].name, 'AUM': s['aum']} for s in broker_stats if s['aum'] > 0])
     if not df_plot.empty:
         fig = px.pie(df_plot, values='AUM', names='Broker', title='Distribuição de Volume por Broker', hole=0.4)
+        fig.update_layout(separators=',.')
+        fig.update_traces(hovertemplate='%{label}<br>Volume: %{value:,.2f} €<extra></extra>')
         graph_html = pio.to_html(fig, full_html=False)
     else:
         graph_html = "<p class='text-muted'>Nenhum dado de volume disponível para gerar o gráfico.</p>"
@@ -292,6 +294,9 @@ def broker_dashboard(id):
                  title='Top 5 Clientes por Volume',
                  labels={'amount': 'Volume(€)', 'client_name': 'Cliente'},
                  color='amount', color_continuous_scale='Blues')
+    fig.update_layout(separators=',.')
+    fig.update_traces(hovertemplate='%{y}<br>Volume: %{x:,.2f} €<extra></extra>')
+    fig.update_xaxes(tickformat=',.2f')
     graph_html = pio.to_html(fig, full_html=False)
     
     return render_template('broker_dashboard.html',
@@ -340,6 +345,8 @@ def cliente_dashboard(id):
                      title='Distribuição de Investimento por Corretor',
                      hole=0.4,
                      color_discrete_sequence=px.colors.sequential.RdBu)
+        fig.update_layout(separators=',.')
+        fig.update_traces(hovertemplate='%{label}<br>Investimento: %{value:,.2f} €<extra></extra>')
         graph_html = pio.to_html(fig, full_html=False)
     else:
         graph_html = "<p style='text-align:center; color:#7f8c8d;'>Sem investimentos ativos no momento.</p>"
@@ -395,6 +402,9 @@ def stats():
     fig_corp = px.bar(df_corp, x='Volume', y='Corporação', orientation='h',
         title='Top 10 Corporações por Volume',
         color='Volume', color_continuous_scale='Blues')
+    fig_corp.update_layout(separators=',.')
+    fig_corp.update_traces(hovertemplate='%{y}<br>Volume: %{x:,.2f} €<extra></extra>')
+    fig_corp.update_xaxes(tickformat=',.2f')
     graph_corp = pio.to_html(fig_corp, full_html=False)
 
     broker_volumes = {}
@@ -408,6 +418,9 @@ def stats():
     fig_broker = px.bar(df_broker, x='Volume', y='Broker', orientation='h',
                         title='Top 5 Brokers por Volume',
                         color='Volume', color_continuous_scale='Blues')
+    fig_broker.update_layout(separators=',.')
+    fig_broker.update_traces(hovertemplate='%{y}<br>Volume: %{x:,.2f} €<extra></extra>')
+    fig_broker.update_xaxes(tickformat=',.2f')
     graph_broker = pio.to_html(fig_broker, full_html=False)
 
     return render_template('stats.html',
