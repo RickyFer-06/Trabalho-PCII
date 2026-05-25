@@ -57,8 +57,8 @@ def chklogin():
 
 @app.route('/admin')
 def admin():
-    corps = [Corporation.obj[id] for id in Corporation.lst]
-    brokers = [Broker.obj[id] for id in dict.fromkeys(Broker.lst)]
+    corps = sorted((Corporation.obj[id] for id in Corporation.lst), key=lambda c: c.name.lower())
+    brokers = sorted((Broker.obj[id] for id in dict.fromkeys(Broker.lst)), key=lambda b: b.name.lower())
     clients = [Client.obj[id] for id in Client.lst]
 
     mapping = {'high': 'ALTO', 'medium': 'MÉDIO', 'low': 'BAIXO'}
@@ -74,6 +74,11 @@ def admin():
         b.num_trades = len(b_trades)
         b.num_clients = len({t.client_id for t in b_trades})
         b.avg_ticket = sum(t.amount for t in b_trades) / len(b_trades) if b_trades else 0
+
+    for cl in clients:
+        c_trades = [t for t in Trade.obj.values() if t.client_id == cl.id]
+        cl.num_trades = len(c_trades)
+        cl.capital_investido = sum(t.amount for t in c_trades) if c_trades else 0
 
     return render_template('admin.html', 
                            lista_corps=corps, 
