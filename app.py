@@ -80,6 +80,85 @@ def admin():
                            lista_brokers=brokers, 
                            lista_clients=clients)
 
+@app.route('/admin/corporation/add', methods=['POST'])
+def admin_add_corporation():
+    name = (request.form.get('name') or '').strip()
+    comments = (request.form.get('comments') or '').strip()
+
+    if not name:
+        return "Nome da corporação é obrigatório.", 400
+
+    new_id = max(Corporation.lst) + 1 if Corporation.lst else 1
+    Corporation(new_id, name, comments)
+    Corporation.insert(new_id)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/corporation/remove', methods=['POST'])
+def admin_remove_corporation():
+    corp_id = request.form.get('corp_id')
+    if not corp_id:
+        return "Corporação inválida.", 400
+
+    corp_id = int(corp_id)
+    if corp_id not in Corporation.obj:
+        return "Corporação não encontrada.", 404
+
+    Corporation.remove(corp_id)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/broker/add', methods=['POST'])
+def admin_add_broker():
+    name = (request.form.get('name') or '').strip()
+    license_number = request.form.get('license_number')
+    corporation_id = request.form.get('corporation_id')
+
+    if not name or not license_number or corporation_id is None:
+        return "Dados do broker incompletos.", 400
+
+    new_id = max(Broker.lst) + 1 if Broker.lst else 1
+    Broker(new_id, name, int(license_number), int(corporation_id))
+    Broker.insert(new_id)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/broker/remove', methods=['POST'])
+def admin_remove_broker():
+    broker_id = request.form.get('broker_id')
+    if not broker_id:
+        return "Broker inválido.", 400
+
+    broker_id = int(broker_id)
+    if broker_id not in Broker.obj:
+        return "Broker não encontrado.", 404
+
+    Broker.remove(broker_id)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/client/add', methods=['POST'])
+def admin_add_client():
+    name = (request.form.get('name') or '').strip()
+    address = (request.form.get('address') or '').strip()
+
+    if not name or not address:
+        return "Dados do cliente incompletos.", 400
+
+    new_id = max(Client.lst) + 1 if Client.lst else 1
+    Client(new_id, name, address)
+    Client.insert(new_id)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/client/remove', methods=['POST'])
+def admin_remove_client():
+    client_id = request.form.get('client_id')
+    if not client_id:
+        return "Cliente inválido.", 400
+
+    client_id = int(client_id)
+    if client_id not in Client.obj:
+        return "Cliente não encontrado.", 404
+
+    Client.remove(client_id)
+    return redirect(url_for('admin'))
+
 @app.route('/corporation/<int:id>/dashboard')
 def corporation_dashboard(id):
     if id not in Corporation.obj:

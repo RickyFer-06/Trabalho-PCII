@@ -41,6 +41,82 @@
       margin-top: 0;
     }
 
+    .column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mini-menu {
+      position: relative;
+    }
+
+    .mini-menu summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      background: #fafafa;
+      user-select: none;
+    }
+
+    .mini-menu summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mini-menu .menu-panel {
+      position: absolute;
+      right: 0;
+      top: 28px;
+      background: white;
+      border: 1px solid #e3e3e3;
+      border-radius: 8px;
+      padding: 10px;
+      width: 240px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      z-index: 50;
+    }
+
+    .mini-menu label {
+      display: block;
+      font-size: 0.8em;
+      color: #6c757d;
+      margin: 6px 0 4px;
+    }
+
+    .mini-menu input,
+    .mini-menu select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9em;
+      box-sizing: border-box;
+    }
+
+    .mini-menu button {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .btn-add {
+      background: #27ae60;
+      color: white;
+    }
+
+    .btn-remove {
+      background: #e74c3c;
+      color: white;
+    }
+
     .corp-title {
       color: #2c3e50;
     }
@@ -143,7 +219,31 @@
 
     <!-- CORPORAÇÕES -->
     <div class="column">
-      <h2 class="corp-title">🏢 Corporações</h2>
+      <div class="column-header">
+        <h2 class="corp-title">🏢 Corporações</h2>
+        <details class="mini-menu">
+          <summary>Gerir</summary>
+          <div class="menu-panel">
+            <form action="/admin/corporation/add" method="POST">
+              <label>Nova corporação</label>
+              <input name="name" placeholder="Nome" required>
+              <label>Comentários (opcional)</label>
+              <input name="comments" placeholder="Notas">
+              <button type="submit" class="btn-add">Adicionar</button>
+            </form>
+            <form action="/admin/corporation/remove" method="POST">
+              <label>Remover corporação</label>
+              <select name="corp_id" required>
+                <option value="" disabled selected>Escolher...</option>
+                {% for c in lista_corps %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn-remove">Remover</button>
+            </form>
+          </div>
+        </details>
+      </div>
       <div class="column-controls">
         <div class="risk-filters">
           <button type="button" class="filter-btn" data-risk="ALTO">High Risk</button>
@@ -163,7 +263,38 @@
 
     <!-- BROKERS -->
     <div class="column">
-      <h2 class="broker-title">💼 Brokers</h2>
+      <div class="column-header">
+        <h2 class="broker-title">💼 Brokers</h2>
+        <details class="mini-menu">
+          <summary>Gerir</summary>
+          <div class="menu-panel">
+            <form action="/admin/broker/add" method="POST">
+              <label>Novo broker</label>
+              <input name="name" placeholder="Nome" required>
+              <label>Nº de licença</label>
+              <input name="license_number" type="number" min="1" placeholder="Ex: 12345" required>
+              <label>Corporação</label>
+              <select name="corporation_id" required>
+                <option value="0">Independente</option>
+                {% for c in lista_corps %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn-add">Adicionar</button>
+            </form>
+            <form action="/admin/broker/remove" method="POST">
+              <label>Remover broker</label>
+              <select name="broker_id" required>
+                <option value="" disabled selected>Escolher...</option>
+                {% for b in lista_brokers %}
+                <option value="{{ b.id }}">{{ b.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn-remove">Remover</button>
+            </form>
+          </div>
+        </details>
+      </div>
       <div class="column-controls">
         <div class="risk-filters">
           <button type="button" class="filter-btn sort-broker-btn" data-sort="clientes">Clientes Ativos</button>
@@ -185,7 +316,31 @@
 
     <!-- CLIENTES -->
     <div class="column">
-      <h2 class="client-title">👤 Clientes</h2>
+      <div class="column-header">
+        <h2 class="client-title">👤 Clientes</h2>
+        <details class="mini-menu">
+          <summary>Gerir</summary>
+          <div class="menu-panel">
+            <form action="/admin/client/add" method="POST">
+              <label>Novo cliente</label>
+              <input name="name" placeholder="Nome" required>
+              <label>Morada</label>
+              <input name="address" placeholder="Morada" required>
+              <button type="submit" class="btn-add">Adicionar</button>
+            </form>
+            <form action="/admin/client/remove" method="POST">
+              <label>Remover cliente</label>
+              <select name="client_id" required>
+                <option value="" disabled selected>Escolher...</option>
+                {% for cl in lista_clients %}
+                <option value="{{ cl.id }}">{{ cl.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn-remove">Remover</button>
+            </form>
+          </div>
+        </details>
+      </div>
       <div class="column-controls">
         <div class="risk-filters filters-spacer"></div>
         <input class="search-input" oninput="filtrar(this)" placeholder="Pesquisar...">
