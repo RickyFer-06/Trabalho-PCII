@@ -8,6 +8,7 @@
     .container {
         max-width: 1200px;
         margin: auto;
+        position: relative;
     }
 
     .btn-voltar {
@@ -39,6 +40,130 @@
         border-left: 4px solid #3498db;
         margin-top: 15px;
         border-radius: 4px;
+    }
+
+    .menu-trigger {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 26px;
+        cursor: pointer;
+        background: white;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: 0.2s;
+        z-index: 1000;
+    }
+
+    .menu-trigger:hover {
+        transform: scale(1.05);
+    }
+
+    .side-drawer {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 250px;
+        height: 100%;
+        background: #2c3e50;
+        color: white;
+        transition: right 0.3s ease;
+        padding: 60px 20px;
+        z-index: 1100;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+    }
+
+    .side-drawer.active {
+        right: 0;
+    }
+
+    .drawer-header {
+        font-weight: bold;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .drawer-section {
+        margin: 10px 0 20px;
+        border-top: 1px solid #34495e;
+        padding-top: 12px;
+        display: none;
+    }
+
+    .drawer-section.active {
+        display: block;
+    }
+
+    .drawer-section label {
+        display: block;
+        font-size: 0.85em;
+        color: #bdc3c7;
+        margin: 6px 0 4px;
+    }
+
+    .drawer-section input,
+    .drawer-section select {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #445b70;
+        border-radius: 6px;
+        background: #22303d;
+        color: white;
+        box-sizing: border-box;
+        font-size: 0.9em;
+    }
+
+    .drawer-section button {
+        margin-top: 10px;
+        width: 100%;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    .btn-add {
+        background: #27ae60;
+        color: white;
+    }
+
+    .btn-remove {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .drawer-item {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-bottom: 1px solid #34495e;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        color: white;
+        text-align: left;
+        transition: 0.2s;
+    }
+
+    .drawer-item:hover {
+        background: #34495e;
+        padding-left: 20px;
+    }
+
+    .drawer-toggle.active {
+        background: #34495e;
     }
 
     .grid-kpis {

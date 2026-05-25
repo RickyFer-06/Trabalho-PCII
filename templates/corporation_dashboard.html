@@ -16,6 +16,8 @@
   </div>
   <div class="container">
 
+    <div class="menu-trigger" onclick="toggleCorpDrawer()">⋮</div>
+
     <div class="header">
       <span class="risk-badge" style="background: {{ risk.cor }}">RISCO CORPORATIVO: {{ risk.nivel }}</span>
       <h1>{{ corp.name }}</h1>
@@ -103,6 +105,76 @@
       </div>
     </div>
   </div>
+
+  <div id="corpDrawer" class="side-drawer">
+    <div class="drawer-header">
+      <img src="{{ url_for('static', filename='images/briefcase-1f4bc.png') }}" alt="Briefcase" class="emoji-icon">
+      Gestao de Brokers
+    </div>
+
+    <button type="button" class="drawer-item drawer-toggle active" data-target="corpAdd"
+      onclick="showCorpSection('corpAdd')">
+      <img src="{{ url_for('static', filename='images/briefcase-1f4bc.png') }}" alt="Add" class="emoji-icon">
+      Adicionar broker
+    </button>
+    <button type="button" class="drawer-item drawer-toggle" data-target="corpRemove"
+      onclick="showCorpSection('corpRemove')">
+      <img src="{{ url_for('static', filename='images/warning-26a0.png') }}" alt="Remove" class="emoji-icon">
+      Remover broker
+    </button>
+
+    <div id="corpAdd" class="drawer-section active">
+      <form action="/admin/broker/add" method="POST">
+        <label>Nome do broker</label>
+        <input name="name" placeholder="Nome" required>
+        <label>Nº de licença</label>
+        <input name="license_number" type="number" min="1" placeholder="Ex: 12345" required>
+        <input type="hidden" name="corporation_id" value="{{ corp.id }}">
+        <button type="submit" class="btn-add">Adicionar broker</button>
+      </form>
+    </div>
+
+    <div id="corpRemove" class="drawer-section">
+      <form action="/admin/broker/remove" method="POST">
+        <label>Remover broker</label>
+        <select name="broker_id" required>
+          <option value="" disabled selected>Escolher...</option>
+          {% for b in brokers %}
+          <option value="{{ b.obj.id }}">{{ b.obj.name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn-remove">Remover broker</button>
+      </form>
+    </div>
+
+    <button type="button" class="drawer-item" onclick="toggleCorpDrawer()">
+      <img src="{{ url_for('static', filename='images/heavy-multiplication-x-2716.jpg') }}" alt="Close"
+        class="emoji-icon">
+      Fechar menu
+    </button>
+  </div>
+
+  <script>
+    function toggleCorpDrawer() {
+      document.getElementById("corpDrawer").classList.toggle("active");
+    }
+
+    function showCorpSection(id) {
+      const sections = document.querySelectorAll(".drawer-section");
+      const buttons = document.querySelectorAll(".drawer-toggle");
+      sections.forEach(section => section.classList.remove("active"));
+      buttons.forEach(button => button.classList.remove("active"));
+      const activeSection = document.getElementById(id);
+      if (activeSection) {
+        activeSection.classList.add("active");
+      }
+      buttons.forEach(button => {
+        if (button.dataset.target === id) {
+          button.classList.add("active");
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>
