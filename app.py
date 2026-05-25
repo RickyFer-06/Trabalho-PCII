@@ -382,11 +382,17 @@ def cliente_dashboard(id):
         return "Erro: Cliente não encontrado!", 404
 
     cliente = Client.obj[id]
-    todos_brokers = [Broker.obj[bid] for bid in Broker.lst]
     
+    saldos = {}  # Mapeamento de broker_id -> saldo acumulado
+    brokers_associados_ids = set()
+    trades_data = []
+
     trades_data = []
     for t in Trade.obj.values():
         if t.client_id == id:
+            brokers_associados_ids.add(t.broker_id)
+            saldos[t.broker_id] = saldos.get(t.broker_id, 0.0) + t.amount
+
             b_name = Broker.obj[t.broker_id].name if t.broker_id in Broker.obj else "Desconhecido"
             trades_data.append({
                 'id': t.id,
@@ -396,34 +402,44 @@ def cliente_dashboard(id):
                 'name': t.name,
                 'date': t.date
             })
-    
+    brokers_adicionar = [Broker.obj[bid] for bid in brokers_associados_ids if bid in Broker.obj]
+    brokers_adicionar = sorted(brokers_adicionar, key=lambda b: b.name.lower())
+
+    brokers_levantar = [Broker.obj[bid] for bid, saldo in saldos.items() if saldo > 0 and bid in Broker.obj]
+    brokers_levantar = sorted(brokers_levantar, key=lambda b: b.name.lower())
+
     df_all = pd.DataFrame(trades_data)
-    if df_all.empty:
-        return render_template('cliente_dashboard.html', cliente=cliente, brokers=todos_brokers, negocios=[], total_investido=0, total_negocios=0, graph_html=None)
-    
-    total_investido = df_all['amount'].sum()
+    total_investido = df_all['amount'].sum() if not df_all.empty else 0
     total_negocios = len(df_all)
-    df_grouped = df_all.groupby('broker_name')['amount'].sum().reset_index()
-    df_grouped = df_grouped[df_grouped['amount'] > 0]
     
-    if not df_grouped.empty:
-        fig = px.pie(df_grouped, values='amount', names='broker_name',
-                     title='Distribuição de Investimento por Corretor',
-                     hole=0.4,
-                     color_discrete_sequence=px.colors.sequential.RdBu)
-        fig.update_layout(separators=',.')
-        fig.update_traces(hovertemplate='%{label}<br>Investimento: %{value:,.2f} €<extra></extra>')
-        graph_html = pio.to_html(fig, full_html=False)
+    if not df_all.empty:
+        df_grouped = df_all.groupby('broker_name')['amount'].sum().reset_index()
+        df_grouped = df_grouped[df_grouped['amount'] > 0]©
+        
+        if not df_grouped.empty:
+            fig = px.pie(df_grouped, values='amount', names='broker_name',
+                         title='Distribuição de Investimento por Corretor',
+                         hole=0.4,
+                         color_discrete_sequence=px.colors.sequential.RdBu)
+            fig.update_layout(separators=',.')
+            fig.update_traces(hovertemplate='%{label}<br>Investimento: %{value:,.2f} €<extra></extra>')
+            graph_html = pio.to_html(fig, full_html=False)
+        else:
+            graph_html = "<p style='text-align:center; color:#7f8c8d;'>Sem investimentos ativos no momento.</p>"
     else:
         graph_html = "<p style='text-align:center; color:#7f8c8d;'>Sem investimentos ativos no momento.</p>"
     
     return render_template('cliente_dashboard.html', 
                            cliente=cliente, 
-                           brokers=todos_brokers,
-                           negocios=df_all.to_dict('records'),
+                           brokers_adicionar=brokers_adicionar,
+                           brokers_levantar=brokers_levantar,
+                           saldos_brokers=saldos,
+                           negocios=df_all.to_dict('records') if not df_all.empty else [],
                            total_investido=total_investido,
                            total_negocios=total_negocios,
                            graph_html=graph_html)
+    
+    
 
 @app.route('/trade/new', methods=['POST'])
 def new_trade():

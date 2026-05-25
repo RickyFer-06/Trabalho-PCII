@@ -94,10 +94,7 @@
         <label>Selecione o Corretor:</label>
         <select name="broker_id" required>
           <option value="" disabled selected>-- Escolha um Broker --</option>
-          {% for b in brokers %}
-          <option value="{{ b.id }}">{{ b.name }}</option>
-          {% endfor %}
-        </select>
+          </select>
 
         <label>Montante (€):</label>
         <input type="number" name="amount" step="0.01" min="0.01" placeholder="Ex: 500.00" required />
@@ -117,6 +114,37 @@
     </div>
   </div>
 
+  <div id="insufficientFundsModal" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal-content" style="text-align: center;">
+      <h3 style="color: #e74c3c;">Saldo Insuficiente</h3>
+      <p id="insufficientFundsMsg" style="margin: 15px 0; color: #34495e; line-height: 1.6;"></p>
+      
+      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+        <button type="button" id="btnProceedMax" class="btn-executar" style="background-color: #27ae60; margin: 0; padding: 10px 15px;">
+          Prosseguir com ação
+        </button>
+        <button type="button" id="btnCancelPopup" class="btn-executar" style="background-color: #7f8c8d; margin: 0; padding: 10px 15px;">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const brokersAdicionar = [
+      {% for b in brokers_adicionar %}
+        { id: {{ b.id }}, name: "{{ b.name }}" },
+      {% endfor %}
+    ];
+
+    const brokersLevantar = [
+      {% for b in brokers_levantar %}
+        { id: {{ b.id }}, name: "{{ b.name }}", saldo: {{ saldos_brokers.get(b.id, 0.0) }} },
+      {% endfor %}
+    ];
+  </script>
+
   <script src="{{ url_for('static', filename='js/cliente_dashboard.js') }}"></script>
 </body>
 </html>
+
