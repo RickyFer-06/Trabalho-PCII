@@ -108,3 +108,54 @@
         display: inline-block;
         margin-right: 5px;
     }
+
+    .broker-row {
+        background-color: #fafafa;
+    }
+
+    .broker-link {
+        color: #2980b9;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .toggle-link {
+        cursor: pointer;
+        margin-left: 10px;
+        color: #7f8c8d;
+        font-size: 0.85em;
+    }
+
+    .detail-row {
+        background-color: #fff;
+    }
+
+    .detail-cell {
+        padding: 0;
+    }
+
+    .client-list-detail {
+        padding: 15px;
+        border-left: 3px solid #3498db;
+        margin-left: 10px;
+    }
+
+    .detail-heading {
+        margin-top: 0;
+        color: #34495e;
+        font-size: 0.85em;
+        text-transform: uppercase;
+    }
+
+    .client-list {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    .no-clients {
+        margin: 0;
+        font-size: 0.9em;
+        color: #999;
+    }

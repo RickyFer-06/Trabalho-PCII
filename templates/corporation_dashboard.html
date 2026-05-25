@@ -4,18 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>Corp Dashboard - {{ corp.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/corporation_dashboard.css') }}">
 </head>
 
 <body>
-  <div
-    style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <a href="{{ url_for('index') }}"
-      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
-    <a href="{{ url_for('user_login') }}"
-      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Corporation)</a> |
-    <a href="javascript:history.back()"
-      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">← Voltar</a>
+  <div class="navbar">
+    <a href="{{ url_for('index') }}">Início</a> |
+    <a href="{{ url_for('user_login') }}">Login (Corporation)</a> |
+    <a href="javascript:history.back()">← Voltar</a>
   </div>
   <div class="container">
 
@@ -67,13 +64,12 @@
           </thead>
           <tbody>
             {% for b in brokers %}
-            <tr style="background-color: #fafafa;">
+            <tr class="broker-row">
               <td>
-                <a href="/broker/{{ b.obj.id }}/dashboard"
-                  style="color: #2980b9; text-decoration: none; font-weight: bold;" title="Ir para dashboard do broker">
+                <a href="/broker/{{ b.obj.id }}/dashboard" class="broker-link" title="Ir para dashboard do broker">
                   {{ b.obj.name }} 🔗
                 </a>
-                <span style="cursor: pointer; margin-left: 10px; color: #7f8c8d; font-size: 0.85em;"
+                <span class="toggle-link"
                   onclick="document.getElementById('clients-{{ b.obj.id }}').style.display = document.getElementById('clients-{{ b.obj.id }}').style.display === 'none' ? 'table-row' : 'none';">
                   Ver Clientes ▾
                 </span>
@@ -85,19 +81,18 @@
                 {{ b.risk_status }}
               </td>
             </tr>
-            <tr id="clients-{{ b.obj.id }}" style="display: none; background-color: #fff;">
-              <td colspan="4" style="padding: 0;">
-                <div style="padding: 15px; border-left: 3px solid #3498db; margin-left: 10px;">
-                  <h5 style="margin-top: 0; color: #34495e; font-size: 0.85em; text-transform: uppercase;">Clientes
-                    deste Broker:</h5>
+            <tr id="clients-{{ b.obj.id }}" class="detail-row" style="display: none;">
+              <td colspan="4" class="detail-cell">
+                <div class="client-list-detail">
+                  <h5 class="detail-heading">Clientes deste Broker:</h5>
                   {% if b.clients %}
-                  <ul style="margin: 0; padding-left: 20px; font-size: 0.9em; color: #555;">
+                  <ul class="client-list">
                     {% for cli in b.clients %}
                     <li>{{ cli.name }}: <strong>{{ cli.amount | moeda }}</strong></li>
                     {% endfor %}
                   </ul>
                   {% else %}
-                  <p style="margin: 0; font-size: 0.9em; color: #999;">Sem clientes associados.</p>
+                  <p class="no-clients">Sem clientes associados.</p>
                   {% endif %}
                 </div>
               </td>

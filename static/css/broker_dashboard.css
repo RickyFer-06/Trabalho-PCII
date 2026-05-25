@@ -120,3 +120,62 @@
         border-bottom: 1px solid #eee;
         font-size: 0.9em;
     }
+
+    .header small,
+    .header-note {
+        color: #bdc3c7;
+    }
+
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .client-row {
+        background-color: #fafafa;
+    }
+
+    .toggle-link {
+        cursor: pointer;
+        margin-left: 10px;
+        color: #2980b9;
+        font-size: 0.85em;
+    }
+
+    .detail-row {
+        background-color: #fff;
+    }
+
+    .detail-cell {
+        padding: 0;
+    }
+
+    .trade-detail {
+        padding: 10px 15px;
+        border-left: 3px solid #2ecc71;
+        margin-left: 10px;
+        background-color: #fcfcfc;
+    }
+
+    .detail-heading {
+        margin-top: 0;
+        color: #7f8c8d;
+        font-size: 0.8em;
+        text-transform: uppercase;
+    }
+
+    .nested-table {
+        margin-top: 5px;
+        background: white;
+        border: 1px solid #eee;
+    }
+
+    .nested-table th,
+    .nested-table td {
+        font-size: 0.8em;
+        padding: 5px;
+    }
+
+    .nested-table td {
+        border-bottom: 1px solid #f9f9f9;
+    }

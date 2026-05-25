@@ -211,3 +211,21 @@
     .btn-executar:hover {
         opacity: 0.9;
     }
+
+    .card-blue {
+        border-left-color: #3498db;
+    }
+
+    .card-yellow {
+        border-left-color: #f1c40f;
+    }
+
+    .card-address {
+        font-size: 1.1em;
+    }
+
+    .drawer-close {
+        margin-top: 20px;
+        color: #e74c3c;
+        border: none;
+    }

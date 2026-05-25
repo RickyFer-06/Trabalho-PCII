@@ -4,18 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard do Cliente - {{ cliente.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente_dashboard.css') }}">
 </head>
 
 <body>
-  <div
-    style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <a href="{{ url_for('index') }}"
-      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
-    <a href="{{ url_for('user_login') }}"
-      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Cliente)</a> |
-    <a href="javascript:history.back()"
-      style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">← Voltar</a>
+  <div class="navbar">
+    <a href="{{ url_for('index') }}">Início</a> |
+    <a href="{{ url_for('user_login') }}">Login (Cliente)</a> |
+    <a href="javascript:history.back()">← Voltar</a>
   </div>
   <div class="container">
 
@@ -35,13 +32,13 @@
         <h3>Total Investido</h3>
         <p>{{ total_investido | moeda }}</p>
       </div>
-      <div class="card" style="border-left-color: #3498db">
+      <div class="card card-blue">
         <h3>Nº de Transações</h3>
         <p>{{ total_negocios }}</p>
       </div>
-      <div class="card" style="border-left-color: #f1c40f">
+      <div class="card card-yellow">
         <h3>Morada Registada</h3>
-        <p style="font-size: 1.1em">{{ cliente.address }}</p>
+        <p class="card-address">{{ cliente.address }}</p>
       </div>
     </div>
 
@@ -81,7 +78,7 @@
     <div class="drawer-item" onclick="openModal('levantar')">
       💸 Levantar Fundos
     </div>
-    <div class="drawer-item" style="margin-top: 20px; color: #e74c3c; border: none" onclick="toggleDrawer()">
+    <div class="drawer-item drawer-close" onclick="toggleDrawer()">
       ✖ Fechar Menu
     </div>
   </div>

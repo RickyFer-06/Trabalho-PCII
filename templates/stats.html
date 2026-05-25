@@ -4,18 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <title>Estatísticas Globais</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stats.css') }}">
 </head>
 
 <body>
-    <div
-        style="text-align: center; margin-bottom: 30px; padding: 10px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <a href="{{ url_for('index') }}"
-            style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Início</a> |
-        <a href="{{ url_for('user_login') }}"
-            style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Login (Admin)</a> |
-        <a href="/stats"
-            style="text-decoration: none; color: #3498db; font-weight: bold; margin: 0 15px;">Estatísticas</a>
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">Início</a> |
+        <a href="{{ url_for('user_login') }}">Login (Admin)</a> |
+        <a href="/stats">Estatísticas</a>
     </div>
     <div class="container">
         <h1>Estatísticas Globais</h1>
