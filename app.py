@@ -59,7 +59,7 @@ def chklogin():
 def admin():
     corps = sorted((Corporation.obj[id] for id in Corporation.lst), key=lambda c: c.name.lower())
     brokers = sorted((Broker.obj[id] for id in dict.fromkeys(Broker.lst)), key=lambda b: b.name.lower())
-    clients = [Client.obj[id] for id in Client.lst]
+    clients = sorted((Client.obj[id] for id in Client.lst), key=lambda c: c.name.lower())
 
     mapping = {'high': 'ALTO', 'medium': 'MÉDIO', 'low': 'BAIXO'}
     for corp in corps:
