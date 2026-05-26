@@ -97,3 +97,55 @@ document.querySelector('#modalOverlay form').addEventListener('submit', function
         }
     }
 });
+
+// Funções para o Modal de Encerrar Conta
+function openCloseAccountModal() {
+    const drawer = document.getElementById("drawer");
+    if (drawer.classList.contains("active")) {
+        drawer.classList.remove("active");
+    }
+    document.getElementById("closeAccountModal").style.display = "flex";
+}
+
+function closeCloseAccountModal() {
+    document.getElementById("closeAccountModal").style.display = "none";
+    document.getElementById("closeAccountForm").reset();
+    document.getElementById("ibanError").style.display = "none";
+}
+
+// Atualiza a função window.onclick existente para suportar o fecho deste novo modal ao clicar fora dele
+window.onclick = function (event) {
+    let overlay = document.getElementById("modalOverlay");
+    let fundsOverlay = document.getElementById("insufficientFundsModal");
+    let closeAccOverlay = document.getElementById("closeAccountModal");
+    
+    if (event.target === overlay) {
+        closeModal();
+    } else if (event.target === fundsOverlay) {
+        fundsOverlay.style.display = "none";
+    } else if (event.target === closeAccOverlay) {
+        closeCloseAccountModal();
+    }
+};
+
+// Validação Interativa do IBAN ao Submeter
+document.getElementById("closeAccountForm").addEventListener("submit", function(e) {
+    const ibanInput = document.getElementById("ibanInput").value;
+    
+    // Removemos espaços vazios para permitir que o utilizador escreva formatado ou tudo junto
+    const cleanIban = ibanInput.replace(/\s+/g, '').toUpperCase();
+    
+    // Expressão Regular: Exige "PT50" seguido de exatamente 21 dígitos numéricos
+    const ibanRegex = /^PT50\d{21}$/;
+    
+    if (!ibanRegex.test(cleanIban)) {
+        e.preventDefault(); // Impede o formulário de seguir para o Python
+        document.getElementById("ibanError").style.display = "block"; // Mostra o erro
+    } else {
+        document.getElementById("ibanError").style.display = "none";
+        // Último alerta nativo do browser de segurança
+        if (!confirm("Tem a certeza absoluta que deseja liquidar os fundos e apagar a sua conta?")) {
+            e.preventDefault(); // Cancela se clicar em "Não" no popup nativo
+        }
+    }
+});

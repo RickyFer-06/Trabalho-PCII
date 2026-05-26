@@ -439,7 +439,40 @@ def cliente_dashboard(id):
                            total_negocios=total_negocios,
                            graph_html=graph_html)
     
+@app.route('/cliente/close_account', methods=['POST'])
+def close_account():
+    client_id = int(request.form.get('client_id'))
     
+    if client_id not in Client.obj:
+        return "Cliente não encontrado.", 404
+        
+    data_atual = datetime.now().strftime("%Y-%m-%d")
+    
+    # Calcular saldo total por broker para fazer a liquidação (Abordagem B)
+    saldos = {}
+    for t in Trade.obj.values():
+        if t.client_id == client_id:
+            saldos[t.broker_id] = saldos.get(t.broker_id, 0.0) + t.amount
+            
+    # Registar uma trade de "Levantamento Total" (Liquidação) onde o saldo for positivo
+    for broker_id, saldo in saldos.items():
+        if saldo > 0:
+            new_id = max(Trade.lst) + 1 if Trade.lst else 1
+            # Inserir montante negativo para zerar a conta
+            Trade(new_id, broker_id, client_id, "Liquidação de Encerramento", data_atual, -saldo)
+            query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) VALUES ({new_id}, {broker_id}, {client_id}, 'Liquidação de Encerramento', '{data_atual}', {-saldo})"
+            Trade.sqlexe(query)
+            
+    # Remover o cliente do sistema (mantendo o histórico das trades)
+    if client_id in Client.lst:
+        Client.lst.remove(client_id)
+    if client_id in Client.obj:
+        del Client.obj[client_id]
+        
+    Client.sqlexe(f"DELETE FROM Client WHERE id={client_id}")
+    
+    # Redirecionar para a Home Page após sucesso
+    return redirect(url_for('index')) 
 
 @app.route('/trade/new', methods=['POST'])
 def new_trade():

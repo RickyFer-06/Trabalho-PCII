@@ -229,3 +229,30 @@
         color: #e74c3c;
         border: none;
     }
+/* Atualização da Barra Lateral */
+.side-drawer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Garante que a barra tem exatamente a altura do ecrã */
+    box-sizing: border-box;
+    padding: 20px 0; /* Dá um espaçamento interno geral no topo e fundo */
+}
+
+/* Grupo do Topo: força os botões a começarem logo lá em cima */
+.drawer-top {
+    display: block;
+    margin-top: 0;
+}
+
+/* O botão de perigo no fundo */
+.drawer-item-bottom {
+    margin-top: auto; /* Empurra este botão para o fundo, respeitando o espaço dos de cima */
+    border-top: 1px solid #4a6278;
+    padding-top: 15px;
+    margin-bottom: 10px; /* Margem de segurança para não colar ao limite do monitor */
+}
+
+.drawer-item-bottom:hover {
+    background-color: #c0392b !important;
+    color: white !important;
+}
