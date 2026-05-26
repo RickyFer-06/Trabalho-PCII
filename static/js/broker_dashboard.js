@@ -61,3 +61,43 @@ window.onclick = function (event) {
     let overlay = document.getElementById("modalOverlay");
     if (event.target == overlay) closeModal();
 };
+
+function openBrokerCloseModal() {
+    const drawer = document.getElementById("drawer");
+    if (drawer.classList.contains("active")) {
+        drawer.classList.remove("active");
+    }
+    document.getElementById("brokerCloseModal").style.display = "flex";
+}
+
+function closeBrokerCloseModal() {
+    document.getElementById("brokerCloseModal").style.display = "none";
+}
+
+window.onclick = function (event) {
+    let overlay = document.getElementById("modalOverlay");
+    let brokerCloseOverlay = document.getElementById("brokerCloseModal");
+    
+    if (event.target === overlay) {
+        closeModal();
+    } else if (event.target === brokerCloseOverlay) {
+        closeBrokerCloseModal();
+    }
+};
+
+function openBrokerCloseModal() {
+    toggleDrawer(); // Fecha o menu lateral
+    document.getElementById("brokerCloseModal").style.display = "flex"; 
+}
+
+function closeBrokerCloseModal() {
+    document.getElementById("brokerCloseModal").style.display = "none"; 
+}
+function openBrokerCloseModal() {
+    toggleDrawer(); 
+    document.getElementById("brokerCloseModal").style.display = "flex";
+}
+
+function closeBrokerCloseModal() {
+    document.getElementById("brokerCloseModal").style.display = "none"; 
+}

@@ -221,6 +221,9 @@
         padding: 80px 20px 20px 20px;
         z-index: 9998;
         box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
     }
 
     .side-drawer.active {
@@ -238,6 +241,18 @@
     .drawer-item:hover {
         background: #34495e;
         padding-left: 25px;
+    }
+    .drawer-item-bottom {
+        margin-top: auto; 
+        border-top: 1px solid #34495e; 
+        border-bottom: none !important;
+    }
+
+    
+    .drawer-item-bottom:hover {
+        background: #c0392b !important;
+        color: white !important;
+        padding-left: 25px; 
     }
 
     .drawer-close {

@@ -128,12 +128,24 @@ def admin_add_broker():
     license_number = request.form.get('license_number')
     corporation_id = request.form.get('corporation_id')
 
-    if not name or not license_number or corporation_id is None:
+    if not name or not corporation_id:
         return "Dados do broker incompletos.", 400
 
+    # 1. Garantir que os IDs são inteiros
+    corp_id = int(corporation_id)
     new_id = max(Broker.lst) + 1 if Broker.lst else 1
-    Broker(new_id, name, int(license_number), int(corporation_id))
+
+    # 2. Criar a instância da classe Broker e registar em memória (obj e lst)
+    novo_broker = Broker(new_id, name, license_number, corp_id)
+    
+    # Garantia absoluta de sincronização da memória RAM
+    if new_id not in Broker.lst:
+        Broker.lst.append(new_id)
+    Broker.obj[new_id] = novo_broker
+
+    # 3. Inserir na Base de Dados SQL
     Broker.insert(new_id)
+
     return redirect(url_for('admin'))
 
 @app.route('/admin/broker/remove', methods=['POST'])
@@ -347,6 +359,38 @@ def broker_dashboard(id):
                            lista_clientes=lista_clientes,
                            clientes_atuais=clientes_atuais,        
                            clientes_disponiveis=clientes_disponiveis)
+
+@app.route('/broker/close_account', methods=['POST'])
+def broker_close_account():
+    broker_id = int(request.form.get('broker_id'))
+    
+    if broker_id not in Broker.obj:
+        return "Broker não encontrado.", 404
+        
+    broker_name = Broker.obj[broker_id].name
+    data_atual = datetime.now().strftime("%Y-%m-%d")
+    
+    saldos_clientes = {}
+    for t in Trade.obj.values():
+        if t.broker_id == broker_id:
+            saldos_clientes[t.client_id] = saldos_clientes.get(t.client_id, 0.0) + t.amount
+            
+    for client_id, saldo in saldos_clientes.items():
+        if saldo > 0:
+            new_id = max(Trade.lst) + 1 if Trade.lst else 1
+            Trade(new_id, broker_id, client_id, f"Liquidação por Encerramento de {broker_name}", data_atual, -saldo)
+            query = f"INSERT INTO Trade (id, broker_id, client_id, name, date, amount) " \
+                    f"VALUES ({new_id}, {broker_id}, {client_id}, 'Liquidação por Encerramento de {broker_name}', '{data_atual}', {-saldo})"
+            Trade.sqlexe(query)
+            
+    if broker_id in Broker.lst:
+        Broker.lst.remove(broker_id)
+    if broker_id in Broker.obj:
+        del Broker.obj[broker_id]
+        
+    Broker.sqlexe(f"DELETE FROM Broker WHERE id={broker_id}")
+    
+    return redirect(url_for('index'))
 
 @app.route('/broker/manage_client', methods=['POST'])
 def manage_client():
