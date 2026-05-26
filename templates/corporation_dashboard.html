@@ -113,29 +113,42 @@
       Gestao de Brokers
     </div>
 
-    <button type="button" class="drawer-item drawer-toggle active" data-target="corpAdd"
-      onclick="showCorpSection('corpAdd')">
+    <button type="button" class="drawer-item drawer-toggle" data-target="corpAdd"
+      onclick="openCorpModal('add')">
       <img src="{{ url_for('static', filename='images/briefcase-1f4bc.png') }}" alt="Add" class="emoji-icon">
       Adicionar broker
     </button>
     <button type="button" class="drawer-item drawer-toggle" data-target="corpRemove"
-      onclick="showCorpSection('corpRemove')">
+      onclick="openCorpModal('remove')">
       <img src="{{ url_for('static', filename='images/warning-26a0.png') }}" alt="Remove" class="emoji-icon">
       Remover broker
     </button>
 
-    <div id="corpAdd" class="drawer-section active">
+    <button type="button" class="drawer-item" onclick="toggleCorpDrawer()">
+      <img src="{{ url_for('static', filename='images/heavy-multiplication-x-2716.png') }}" alt="Close"
+        class="emoji-icon">
+      Fechar menu
+    </button>
+  </div>
+
+  <div id="corpAddModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Adicionar broker</h3>
       <form action="/admin/broker/add" method="POST">
         <label>Nome do broker</label>
         <input name="name" placeholder="Nome" required>
         <label>Nº de licença</label>
         <input name="license_number" type="number" min="1" placeholder="Ex: 12345" required>
         <input type="hidden" name="corporation_id" value="{{ corp.id }}">
-        <button type="submit" class="btn-add">Adicionar broker</button>
+        <button type="submit" class="btn-add modal-action">Adicionar broker</button>
+        <p class="modal-cancel" onclick="closeCorpModal()">Cancelar</p>
       </form>
     </div>
+  </div>
 
-    <div id="corpRemove" class="drawer-section">
+  <div id="corpRemoveModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Remover broker</h3>
       <form action="/admin/broker/remove" method="POST">
         <label>Remover broker</label>
         <select name="broker_id" required>
@@ -144,15 +157,10 @@
           <option value="{{ b.obj.id }}">{{ b.obj.name }}</option>
           {% endfor %}
         </select>
-        <button type="submit" class="btn-remove">Remover broker</button>
+        <button type="submit" class="btn-remove modal-action">Remover broker</button>
+        <p class="modal-cancel" onclick="closeCorpModal()">Cancelar</p>
       </form>
     </div>
-
-    <button type="button" class="drawer-item" onclick="toggleCorpDrawer()">
-      <img src="{{ url_for('static', filename='images/heavy-multiplication-x-2716.png') }}" alt="Close"
-        class="emoji-icon">
-      Fechar menu
-    </button>
   </div>
 
   <script src="{{ url_for('static', filename='js/corporation_dashboard.js') }}"></script>

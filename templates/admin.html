@@ -421,7 +421,7 @@
       document.querySelectorAll('.risk-filters').forEach(container => {
         container.addEventListener('click', function (e) {
           const btn = e.target.closest('.filter-btn');
-          if (!btn || btn.classList.contains('sort-broker-btn')) return;
+          if (!btn || btn.classList.contains('sort-broker-btn') || btn.classList.contains('client-sort-btn')) return;
           btn.classList.toggle('active');
           applyFilters(container.closest('.column'));
         });
