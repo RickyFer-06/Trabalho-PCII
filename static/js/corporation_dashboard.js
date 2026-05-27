@@ -19,6 +19,14 @@ function openCorpModal(type) {
         removeModal.style.display = "flex";
     }
 }
+function openCorpCloseModal() {
+    toggleCorpDrawer(); // Fecha o menu lateral
+    document.getElementById("corpCloseModal").style.display = "flex";
+}
+
+function closeCorpCloseModal() {
+    document.getElementById("corpCloseModal").style.display = "none";
+}
 
 function closeCorpModal() {
     document.getElementById("corpAddModal").style.display = "none";
@@ -28,7 +36,11 @@ function closeCorpModal() {
 window.onclick = function (event) {
     const addModal = document.getElementById("corpAddModal");
     const removeModal = document.getElementById("corpRemoveModal");
+    const closeCorpModalOverlay = document.getElementById("corpCloseModal");
+
     if (event.target === addModal || event.target === removeModal) {
         closeCorpModal();
+    } else if (event.target === closeCorpModalOverlay) {
+        closeCorpCloseModal();
     }
 };

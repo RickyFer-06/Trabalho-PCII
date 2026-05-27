@@ -271,6 +271,39 @@ def corporation_dashboard(id):
                            graph_html=graph_html,
                            brokers=broker_stats)
 
+@app.route('/corporation/close_account', methods=['POST'])
+def close_corporation_account():
+    corp_id = request.form.get('corp_id')
+    if not corp_id:
+        return "Corporação inválida.", 400
+
+    corp_id = int(corp_id)
+    if corp_id not in Corporation.obj:
+        return "Corporação não encontrada.", 404
+
+    # 1. Encontrar todos os brokers associados a esta corporação
+    broker_ids = [bid for bid in list(Broker.lst) if Broker.obj[bid].corporation_id == corp_id]
+    
+    for bid in broker_ids:
+        # 2. Encontrar e apagar todas as transações associadas a cada broker
+        trade_ids = [tid for tid in list(Trade.lst) if Trade.obj[tid].broker_id == bid]
+        for tid in trade_ids:
+            Trade.lst.remove(tid)
+            del Trade.obj[tid]
+        Trade.sqlexe(f"DELETE FROM Trade WHERE broker_id={bid}")
+        
+        # 3. Apagar o broker
+        Broker.lst.remove(bid)
+        del Broker.obj[bid]
+    
+    # Executa a limpeza final de brokers na BD para esta corporação
+    Broker.sqlexe(f"DELETE FROM Broker WHERE corporation_id={corp_id}")
+
+    # 4. Finalmente, apagar a Corporação e redirecionar para a página inicial
+    Corporation.remove(corp_id)
+    
+    return redirect(url_for('index'))
+
 @app.route('/broker/<int:id>/dashboard')
 def broker_dashboard(id):
     if id not in Broker.obj:
