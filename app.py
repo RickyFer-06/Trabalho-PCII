@@ -131,19 +131,15 @@ def admin_add_broker():
     if not name or not corporation_id:
         return "Dados do broker incompletos.", 400
 
-    # 1. Garantir que os IDs são inteiros
     corp_id = int(corporation_id)
     new_id = max(Broker.lst) + 1 if Broker.lst else 1
 
-    # 2. Criar a instância da classe Broker e registar em memória (obj e lst)
     novo_broker = Broker(new_id, name, license_number, corp_id)
     
-    # Garantia absoluta de sincronização da memória RAM
     if new_id not in Broker.lst:
         Broker.lst.append(new_id)
     Broker.obj[new_id] = novo_broker
 
-    # 3. Inserir na Base de Dados SQL
     Broker.insert(new_id)
 
     return redirect(url_for('admin'))
