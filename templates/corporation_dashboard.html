@@ -43,7 +43,7 @@
         <p>{{ avg_ticket | moeda }}</p>
       </div>
       <div class="card">
-        <h4>Nº Brokers</h4>
+        <h4>Nº Corretores</h4>
         <p>{{ num_brokers }}</p>
       </div>
       <div class="card">
@@ -55,11 +55,11 @@
     <div class="main-section">
       <div class="panel">{{ graph_html|safe }}</div>
       <div class="panel">
-        <h3>Ranking e Status de Brokers</h3>
+        <h3>Ranking e Status de Corretores</h3>
         <table>
           <thead>
             <tr>
-              <th>Broker</th>
+              <th>Corretor</th>
               <th>Volume (AUM)</th>
               <th>Clientes</th>
               <th>Risco</th>
@@ -87,7 +87,7 @@
             <tr id="clients-{{ b.obj.id }}" class="detail-row" style="display: none;">
               <td colspan="4" class="detail-cell">
                 <div class="client-list-detail">
-                  <h5 class="detail-heading">Clientes deste Broker:</h5>
+                  <h5 class="detail-heading">Clientes deste Corretor:</h5>
                   {% if b.clients %}
                   <ul class="client-list">
                     {% for cli in b.clients %}
@@ -110,18 +110,18 @@
   <div id="corpDrawer" class="side-drawer">
     <div class="drawer-header">
       <img src="{{ url_for('static', filename='images/briefcase-1f4bc.png') }}" alt="Briefcase" class="emoji-icon">
-      Gestao de Brokers
+      Gestao de Corretores
     </div>
 
     <button type="button" class="drawer-item drawer-toggle" data-target="corpAdd"
       onclick="openCorpModal('add')">
       <img src="{{ url_for('static', filename='images/briefcase-1f4bc.png') }}" alt="Add" class="emoji-icon">
-      Adicionar broker
+      Adicionar corretor
     </button>
     <button type="button" class="drawer-item drawer-toggle" data-target="corpRemove"
       onclick="openCorpModal('remove')">
       <img src="{{ url_for('static', filename='images/warning-26a0.png') }}" alt="Remove" class="emoji-icon">
-      Remover broker
+      Remover corretor
     </button>
 
     <button type="button" class="drawer-item" onclick="toggleCorpDrawer()">
@@ -137,14 +137,14 @@
 
   <div id="corpAddModal" class="modal-overlay">
     <div class="modal-content">
-      <h3>Adicionar broker</h3>
+      <h3>Adicionar corretor</h3>
       <form action="/admin/broker/add" method="POST">
-        <label>Nome do broker</label>
+        <label>Nome do corretor</label>
         <input name="name" placeholder="Nome" required>
         <label>Nº de licença</label>
         <input name="license_number" type="number" min="1" placeholder="Ex: 12345" required>
         <input type="hidden" name="corporation_id" value="{{ corp.id }}">
-        <button type="submit" class="btn-add modal-action">Adicionar broker</button>
+        <button type="submit" class="btn-add modal-action">Adicionar corretor</button>
         <p class="modal-cancel" onclick="closeCorpModal()">Cancelar</p>
       </form>
     </div>
@@ -152,16 +152,16 @@
 
   <div id="corpRemoveModal" class="modal-overlay">
     <div class="modal-content">
-      <h3>Remover broker</h3>
+      <h3>Remover corretor</h3>
       <form action="/admin/broker/remove" method="POST">
-        <label>Remover broker</label>
+        <label>Remover corretor</label>
         <select name="broker_id" required>
           <option value="" disabled selected>Escolher...</option>
           {% for b in brokers %}
           <option value="{{ b.obj.id }}">{{ b.obj.name }}</option>
           {% endfor %}
         </select>
-        <button type="submit" class="btn-remove modal-action">Remover broker</button>
+        <button type="submit" class="btn-remove modal-action">Remover corretor</button>
         <p class="modal-cancel" onclick="closeCorpModal()">Cancelar</p>
       </form>
     </div>
@@ -172,7 +172,7 @@
     <div class="modal-content">
       <h3 style="color: #c0392b; border-bottom: 2px solid #e74c3c; margin-top: 0; padding-bottom: 10px;">⚠️ Encerrar Corporação</h3>
       <p style="color: #34495e; font-size: 0.95em; line-height: 1.5; margin-bottom: 20px; text-align: left;">
-        <strong>Aviso Crítico:</strong> Esta ação irá remover permanentemente a corporação <strong>{{ corp.name }}</strong> do sistema. <strong>TODOS</strong> os Brokers associados e respetivas transações serão liquidadas e apagadas.
+        <strong>Aviso Crítico:</strong> Esta ação irá remover permanentemente a corporação <strong>{{ corp.name }}</strong> do sistema. <strong>TODOS</strong> os Corretores associados e respetivas transações serão liquidadas e apagadas.
       </p>
 
       <form action="/corporation/close_account" method="POST">

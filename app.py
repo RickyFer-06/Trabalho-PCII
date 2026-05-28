@@ -253,9 +253,9 @@ def corporation_dashboard(id):
     else:
         corp_risk = {'nivel': 'ESTÁVEL', 'cor': '#27ae60', 'msg': 'A estrutura de brokers está saudável e diversificada.'}
 
-    df_plot = pd.DataFrame([{'Broker': s['obj'].name, 'AUM': s['aum']} for s in broker_stats if s['aum'] > 0])
+    df_plot = pd.DataFrame([{'Corretor': s['obj'].name, 'AUM': s['aum']} for s in broker_stats if s['aum'] > 0])
     if not df_plot.empty:
-        fig = px.pie(df_plot, values='AUM', names='Broker', title='Distribuição de Volume por Broker', hole=0.4)
+        fig = px.pie(df_plot, values='AUM', names='Corretor', title='Distribuição de Volume por Corretor', hole=0.4)
         fig.update_layout(separators=',.')
         fig.update_traces(hovertemplate='%{label}<br>Volume: %{value:,.2f} €<extra></extra>')
         graph_html = pio.to_html(fig, full_html=False)
@@ -601,10 +601,10 @@ def stats():
         if broker:
             broker_volumes[broker.name] = broker_volumes.get(broker.name, 0) + t.amount
 
-    df_broker = pd.DataFrame(list(broker_volumes.items()), columns=['Broker', 'Volume'])
+    df_broker = pd.DataFrame(list(broker_volumes.items()), columns=['Corretor', 'Volume'])
     df_broker = df_broker.sort_values('Volume', ascending=True).tail(5)
-    fig_broker = px.bar(df_broker, x='Volume', y='Broker', orientation='h',
-                        title='Top 5 Brokers por Volume',
+    fig_broker = px.bar(df_broker, x='Volume', y='Corretor', orientation='h',
+                        title='Top 5 Corretores por Volume',
                         color='Volume', color_continuous_scale='Blues')
     fig_broker.update_layout(separators=',.')
     fig_broker.update_traces(hovertemplate='%{y}<br>Volume: %{x:,.2f} €<extra></extra>')

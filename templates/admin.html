@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt">
 
 <head>
@@ -75,12 +75,12 @@
     <div class="column">
       <div class="column-header">
         <h2 class="broker-title"><img src="{{ url_for('static', filename='images/briefcase-1f4bc.png') }}"
-          alt="Briefcase" class="emoji-icon"> Brokers</h2>
+          alt="Briefcase" class="emoji-icon"> Corretores</h2>
         <details class="mini-menu">
           <summary>Gerir</summary>
           <div class="menu-panel">
             <form action="/admin/broker/add" method="POST">
-              <label>Novo broker</label>
+              <label>Novo corretor</label>
               <input name="name" placeholder="Nome" required>
               <label>Nº de licença</label>
               <input name="license_number" type="number" min="1" placeholder="Ex: 12345" required>
@@ -94,7 +94,7 @@
               <button type="submit" class="btn-add">Adicionar</button>
             </form>
             <form action="/admin/broker/remove" method="POST" onsubmit="return confirmarRemocao(this, 'broker e todas as suas transações')">
-              <label>Remover broker</label>
+              <label>Remover corretor</label>
               <select name="broker_id" required>
                 <option value="" disabled selected>Escolher...</option>
                 {% for b in lista_brokers %}
