@@ -1,5 +1,8 @@
         body {
             background-color: #f8f9fa;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: hidden;
         }
 
         .hero-section {
@@ -8,4 +11,21 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
+        }
+
+        .background-logo {
+            position: fixed;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: min(70vw, 700px);
+            opacity: 0.12;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .navbar,
+        .hero-section {
+            position: relative;
+            z-index: 1;
         }
