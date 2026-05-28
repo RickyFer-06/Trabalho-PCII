@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Broker Dashboard - {{ broker.name }}</title>
+  <title>Corretor Dashboard - {{ broker.name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/broker_dashboard.css') }}">
 </head>
@@ -12,7 +12,7 @@
   <div class="navbar">
     <img src="{{ url_for('static', filename='images/g53_logo.png') }}" alt="Logo" class="navbar-logo">
     <a href="{{ url_for('index') }}">Início</a> |
-    <a href="{{ url_for('user_login') }}">Login (Broker)</a> |
+    <a href="{{ url_for('user_login') }}">Login (Corretor)</a> |
     <a href="javascript:history.back()">← Voltar</a>
   </div>
 
@@ -21,7 +21,7 @@
     <div class="menu-trigger" onclick="toggleDrawer()">⋮</div>
 
     <div class="header">
-      <h1> Broker: {{ broker.name }}
+      <h1> Corretor: {{ broker.name }}
         <span class="risk-badge" style="background-color: {{ risco.cor }}">RISCO {{ risco.nivel }}</span>
       </h1>
       <p>Empresa: {{ empresa }} | Licença: #{{ broker.license_number }}</p>
@@ -42,7 +42,7 @@
         <p>{{ total_investido | moeda }}</p>
       </div>
       <div class="card">
-        <h4>Ticket Médio</h4>
+        <h4>Transação Média</h4>
         <p>{{ ticket_medio | moeda }}</p>
       </div>
       <div class="card">

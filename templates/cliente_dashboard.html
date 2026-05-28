@@ -52,7 +52,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for trade in negocios %}
+        {% for trade in negocios | sort(attribute='date', reverse=True) %}
         <tr>
           <td>{{ trade.date }}</td>
           <td>{{ trade.name }}</td>

@@ -466,7 +466,7 @@ def cliente_dashboard(id):
             brokers_associados_ids.add(t.broker_id)
             saldos[t.broker_id] = saldos.get(t.broker_id, 0.0) + t.amount
 
-            b_name = Broker.obj[t.broker_id].name if t.broker_id in Broker.obj else "Desconhecido"
+            b_name = Broker.obj[t.broker_id].name if t.broker_id in Broker.obj else "Removido do sistema"
             trades_data.append({
                 'id': t.id,
                 'broker_name': b_name, 
