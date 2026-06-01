@@ -53,14 +53,22 @@
       </thead>
       <tbody>
         {% for trade in negocios | sort(attribute='date', reverse=True) %}
-        <tr>
-          <td>{{ trade.date }}</td>
-          <td>{{ trade.name }}</td>
-          <td>{{ trade.broker_name }}</td>
-          <td style="color: {{ 'green' if trade.amount > 0 else 'red' }}">
-            <strong>{{ trade.amount | moeda }}</strong>
-          </td>
-        </tr>
+          {% if trade.amount != 0 %}
+          <tr>
+            <td>{{ trade.date }}</td>
+            <td>
+              {% if trade.amount < 0 %}
+                Levantamento
+              {% else %}
+                Investimento
+              {% endif %}
+            </td>
+            <td>{{ trade.broker_name }}</td>
+            <td style="color: {{ 'green' if trade.amount > 0 else 'red' }}">
+              <strong>{{ trade.amount | moeda }}</strong>
+            </td>
+          </tr>
+          {% endif %}
         {% endfor %}
       </tbody>
     </table>
