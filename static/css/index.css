@@ -16,8 +16,8 @@
         .background-logo {
             position: fixed;
             left: 50%;
-            bottom: 0;
-            transform: translateX(-50%);
+            top: 50%;
+            transform: translate(-50%, -50%);
             width: min(70vw, 700px);
             opacity: 0.12;
             z-index: 0;
