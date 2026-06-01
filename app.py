@@ -412,13 +412,19 @@ def broker_close_account():
                     f"VALUES ({new_id}, {broker_id}, {client_id}, 'Liquidação por Encerramento de {broker_name}', '{data_atual}', {-saldo})"
             Trade.sqlexe(query)
             
+    trade_ids = [tid for tid in list(Trade.lst) if Trade.obj[tid].broker_id == broker_id]
+    for tid in trade_ids:
+        Trade.lst.remove(tid)
+        del Trade.obj[tid]
+    Trade.sqlexe(f"DELETE FROM Trade WHERE broker_id={broker_id}")
+
     if broker_id in Broker.lst:
         Broker.lst.remove(broker_id)
     if broker_id in Broker.obj:
         del Broker.obj[broker_id]
-        
+
     Broker.sqlexe(f"DELETE FROM Broker WHERE id={broker_id}")
-    
+
     return redirect(url_for('index'))
 
 @app.route('/broker/manage_client', methods=['POST'])

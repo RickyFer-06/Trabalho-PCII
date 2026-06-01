@@ -128,18 +128,37 @@
   </div>
 
   <div id="insufficientFundsModal" class="modal-overlay" style="display: none; z-index: 9999;">
-    <div class="modal-content" style="text-align: center;">
-      <h3 style="color: #e74c3c;">Saldo Insuficiente</h3>
-      <p id="insufficientFundsMsg" style="margin: 15px 0; color: #34495e; line-height: 1.6;"></p>
-      
-      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
-        <button type="button" id="btnProceedMax" class="btn-executar" style="background-color: #27ae60; margin: 0; padding: 10px 15px;">
-          Prosseguir com ação
-        </button>
-        <button type="button" id="btnCancelPopup" class="btn-executar" style="background-color: #7f8c8d; margin: 0; padding: 10px 15px;">
-          Cancelar
-        </button>
+    <div class="modal-content">
+      <h3 class="modal-error-title">Saldo Insuficiente</h3>
+      <p class="modal-error-msg">Tentou levantar <strong id="amountRequested"></strong> mas só tem <strong id="amountAvailable"></strong> disponível neste corretor.</p>
+      <button type="button" id="btnProceedMax" class="btn-executar btn-danger">
+        Levantar <span id="maxAmountLabel"></span>
+      </button>
+      <p class="modal-cancel" id="btnCancelPopup">Cancelar</p>
+    </div>
+  </div>
+
+  <div id="confirmWithdrawModal" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal-content">
+      <h3 class="modal-confirm-title">Confirmar Levantamento</h3>
+      <div class="withdraw-summary">
+        <div class="summary-row">
+          <span>Tem disponível:</span>
+          <strong id="summaryDisponivel"></strong>
+        </div>
+        <div class="summary-row">
+          <span>Vai levantar:</span>
+          <strong id="summaryLevantar"></strong>
+        </div>
+        <div class="summary-row summary-final">
+          <span>Fica com:</span>
+          <strong id="summaryFinal"></strong>
+        </div>
       </div>
+      <button type="button" id="btnConfirmWithdraw" class="btn-executar btn-danger">
+        Levantar <span id="confirmAmountLabel"></span>
+      </button>
+      <p class="modal-cancel" id="btnCancelConfirm">Cancelar</p>
     </div>
   </div>
   <div id="closeAccountModal" class="modal-overlay" style="display: none; z-index: 10000;">

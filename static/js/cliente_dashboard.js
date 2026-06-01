@@ -49,54 +49,64 @@ function closeModal() {
     document.querySelector('#modalOverlay form').reset();
 }
 
-window.onclick = function (event) {
-    let overlay = document.getElementById("modalOverlay");
-    let fundsOverlay = document.getElementById("insufficientFundsModal");
-    
-    if (event.target === overlay) {
-        closeModal();
-    } else if (event.target === fundsOverlay) {
-        fundsOverlay.style.display = "none";
-    }
-};
+
+
+function fmt(val) {
+    return val.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
 
 document.querySelector('#modalOverlay form').addEventListener('submit', function(e) {
     const tipo = document.getElementById('tipoOperacao').value;
-    
-    if (tipo === 'levantar') {
-        const brokerSelect = document.querySelector('select[name="broker_id"]');
-        const brokerId = parseInt(brokerSelect.value);
-        const amountInput = document.querySelector('input[name="amount"]');
-        const amountRequested = parseFloat(amountInput.value);
-        
-        const targetBroker = brokersLevantar.find(b => b.id === brokerId);
-        
-        if (targetBroker && amountRequested > targetBroker.saldo) {
-            e.preventDefault(); 
-            
-            const reqStr = amountRequested.toLocaleString('pt-PT', { minimumFractionDigits: 2 });
-            const dispStr = targetBroker.saldo.toLocaleString('pt-PT', { minimumFractionDigits: 2 });
-            
-            document.getElementById('insufficientFundsMsg').innerHTML = 
-                `Impossível levantar <strong>${reqStr} €</strong>.<br>` +
-                `Apenas possui <strong>${dispStr} €</strong> disponível para levantar neste corretor.`;
-            
-            document.getElementById('btnProceedMax').onclick = function() {
-                
-                amountInput.value = targetBroker.saldo.toFixed(2);
-                document.getElementById('insufficientFundsModal').style.display = 'none';
-                
-                e.target.submit(); 
-            };
-            
-            document.getElementById('btnCancelPopup').onclick = function() {
-                document.getElementById('insufficientFundsModal').style.display = 'none';
-            };
-            
-            document.getElementById('insufficientFundsModal').style.display = 'flex';
-        }
+    if (tipo !== 'levantar') return;
+
+    e.preventDefault();
+
+    const brokerSelect = document.querySelector('select[name="broker_id"]');
+    const brokerId = parseInt(brokerSelect.value);
+    const amountInput = document.querySelector('input[name="amount"]');
+    const amountRequested = parseFloat(amountInput.value);
+    const form = e.target;
+
+    const targetBroker = brokersLevantar.find(b => b.id === brokerId);
+    if (!targetBroker) return;
+
+    if (amountRequested > targetBroker.saldo) {
+        document.getElementById('amountRequested').textContent = fmt(amountRequested);
+        document.getElementById('amountAvailable').textContent = fmt(targetBroker.saldo);
+        document.getElementById('maxAmountLabel').textContent = fmt(targetBroker.saldo);
+
+        document.getElementById('btnProceedMax').onclick = function () {
+            amountInput.value = targetBroker.saldo.toFixed(2);
+            document.getElementById('insufficientFundsModal').style.display = 'none';
+            showConfirmModal(targetBroker, targetBroker.saldo, form);
+        };
+        document.getElementById('btnCancelPopup').onclick = function () {
+            document.getElementById('insufficientFundsModal').style.display = 'none';
+        };
+
+        document.getElementById('insufficientFundsModal').style.display = 'flex';
+    } else {
+        showConfirmModal(targetBroker, amountRequested, form);
     }
 });
+
+function showConfirmModal(broker, amount, form) {
+    const ficaCom = broker.saldo - amount;
+    document.getElementById('summaryDisponivel').textContent = fmt(broker.saldo);
+    document.getElementById('summaryLevantar').textContent = fmt(amount);
+    document.getElementById('summaryFinal').textContent = fmt(ficaCom);
+    document.getElementById('confirmAmountLabel').textContent = fmt(amount);
+
+    document.getElementById('btnConfirmWithdraw').onclick = function () {
+        document.getElementById('confirmWithdrawModal').style.display = 'none';
+        form.submit();
+    };
+    document.getElementById('btnCancelConfirm').onclick = function () {
+        document.getElementById('confirmWithdrawModal').style.display = 'none';
+    };
+
+    document.getElementById('confirmWithdrawModal').style.display = 'flex';
+}
 
 // Funções para o Modal de Encerrar Conta
 function openCloseAccountModal() {
@@ -113,18 +123,15 @@ function closeCloseAccountModal() {
     document.getElementById("ibanError").style.display = "none";
 }
 
-// Atualiza a função window.onclick existente para suportar o fecho deste novo modal ao clicar fora dele
 window.onclick = function (event) {
-    let overlay = document.getElementById("modalOverlay");
-    let fundsOverlay = document.getElementById("insufficientFundsModal");
-    let closeAccOverlay = document.getElementById("closeAccountModal");
-    
-    if (event.target === overlay) {
-        closeModal();
-    } else if (event.target === fundsOverlay) {
-        fundsOverlay.style.display = "none";
-    } else if (event.target === closeAccOverlay) {
-        closeCloseAccountModal();
+    const overlays = {
+        'modalOverlay': closeModal,
+        'insufficientFundsModal': closeModal,
+        'confirmWithdrawModal': closeModal,
+        'closeAccountModal': closeCloseAccountModal
+    };
+    for (const [id, fn] of Object.entries(overlays)) {
+        if (event.target === document.getElementById(id)) { fn(); break; }
     }
 };
 

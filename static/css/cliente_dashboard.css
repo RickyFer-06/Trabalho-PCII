@@ -229,6 +229,62 @@
         color: #e74c3c;
         border: none;
     }
+
+    .modal-error-title {
+        margin-top: 0;
+        color: #e74c3c;
+        border-bottom: 2px solid #e74c3c;
+        padding-bottom: 10px;
+    }
+
+    .modal-error-msg {
+        color: #34495e;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
+
+    .modal-confirm-title {
+        margin-top: 0;
+        color: #2c3e50;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .withdraw-summary {
+        margin: 20px 0;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95em;
+        color: #34495e;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+
+    .summary-final {
+        background: #fdf2f2;
+        color: #c0392b;
+        font-weight: bold;
+    }
+
+    .summary-final strong {
+        color: #c0392b;
+    }
 /* Atualização da Barra Lateral */
 .side-drawer {
     display: flex;
